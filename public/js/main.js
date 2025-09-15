@@ -1,7 +1,6 @@
-// ARQUIVO: public/js/main.js (VERSÃO FINAL E CORRIGIDA)
+
 
 document.addEventListener('DOMContentLoaded', () => {
-    // --- VARIÁVEIS GLOBAIS E INICIALIZAÇÃO ---
     let allProducts = [];
     const productsContainer = document.getElementById('productsContainer');
     const cartItemCountElement = document.getElementById('cart-item-count');
@@ -19,7 +18,6 @@ document.addEventListener('DOMContentLoaded', () => {
         currentYearElement.textContent = new Date().getFullYear();
     }
 
-    // --- FUNÇÕES DE BUSCA DE DADOS ---
     async function fetchAllProducts() {
         if (allProducts.length > 0) return allProducts;
         try {
@@ -43,7 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- FUNÇÃO DE RENDERIZAÇÃO DE PRODUTOS ---
     function renderProducts(productsToRender, container) {
         if (!container) return;
         
@@ -85,8 +82,6 @@ document.addEventListener('DOMContentLoaded', () => {
         addEventListenersToProductCards();
     }
     
-    // --- AUTENTICAÇÃO, CARRINHO, FAVORITOS, ETC. ---
-    // (As funções abaixo estão completas e corretas)
     const signupForm = document.getElementById('signupForm'); if (signupForm) { signupForm.addEventListener('submit', async (e) => { e.preventDefault(); const name = document.getElementById('signup-name').value; const email = document.getElementById('signup-email').value; const password = document.getElementById('signup-senha').value; const confirmPassword = document.getElementById('signup-confirma-senha').value; if (password !== confirmPassword) { showFeedbackMessage('As senhas não coincidem!', 'error', 'signupFeedback'); return; } try { const response = await fetch('/api/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, email, password, confirmPassword }) }); const result = await response.json(); if (response.ok) { showFeedbackMessage(result.message, 'success', 'signupFeedback'); signupForm.reset(); setTimeout(() => window.location.href = 'login.html', 2000); } else { showFeedbackMessage(result.message, 'error', 'signupFeedback'); } } catch (err) { showFeedbackMessage('Erro de conexão. Tente novamente.', 'error', 'signupFeedback'); } }); }
     const loginForm = document.getElementById('loginForm'); if (loginForm) { loginForm.addEventListener('submit', async (e) => { e.preventDefault(); const email = document.getElementById('login-email').value; const password = document.getElementById('login-senha').value; try { const response = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) }); const result = await response.json(); if (response.ok) { showFeedbackMessage(result.message, 'success', 'loginFeedback'); setTimeout(() => window.location.href = 'index.html', 1500); } else { showFeedbackMessage(result.message, 'error', 'loginFeedback'); } } catch(err) { showFeedbackMessage('Erro de conexão. Tente novamente.', 'error', 'loginFeedback'); } }); }
     if (menuToggle && mainNav) { menuToggle.addEventListener('click', () => { mainNav.classList.toggle('active'); menuToggle.querySelector('i').classList.toggle('fa-bars'); menuToggle.querySelector('i').classList.toggle('fa-times'); }); }
@@ -103,7 +98,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function showFeedbackMessage(message, type = 'success', containerId = 'feedbackMessageContainer') { const container = document.getElementById(containerId); if (!container) return; container.innerHTML = `<div class="feedback-message ${type}">${message}</div>`; setTimeout(() => { container.innerHTML = ''; }, 4000); }
     document.querySelectorAll('.password-toggle').forEach(button => { button.addEventListener('click', () => { const passwordInput = button.previousElementSibling; const icon = button.querySelector('i'); if (passwordInput.type === 'password') { passwordInput.type = 'text'; icon.classList.remove('fa-eye-slash'); icon.classList.add('fa-eye'); } else { passwordInput.type = 'password'; icon.classList.remove('fa-eye'); icon.classList.add('fa-eye-slash'); } }); });
 
-    // --- RENDERIZAÇÃO DE PÁGINAS ESPECÍFICAS ---
     function setupLoadMoreButton() {
         const loadMoreBtn = document.getElementById('loadMoreBtn');
         if (!loadMoreBtn) return;
@@ -136,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
             container.classList.remove('hidden');
             emptyMessage.classList.add('hidden');
             const favoriteProducts = allProducts.filter(p => favorites.includes(p.id));
-            container.innerHTML = ''; // Limpa a área antes de renderizar
+            container.innerHTML = ''; 
             renderProducts(favoriteProducts, container);
         }
     }
@@ -169,10 +163,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 ...p,
                 preco_produto: 30.90 + (index * 1.5)
             }));
-
-            // ==========================================================
-            // CORREÇÃO APLICADA AQUI: Limpa o container antes de renderizar
-            // ==========================================================
             if (productsContainerEl) productsContainerEl.innerHTML = '';
             renderProducts(productsWithPrice, productsContainerEl);
 
@@ -183,7 +173,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- FUNÇÃO PRINCIPAL DE INICIALIZAÇÃO DA PÁGINA ---
     async function initializePage() {
         await fetchAllProducts();
         

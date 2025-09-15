@@ -1,4 +1,4 @@
-// ARQUIVO: server.js (COMPLETO E ALTERADO)
+
 
 require('dotenv').config(); // Garante que as variáveis de ambiente sejam carregadas
 const express = require('express');
@@ -12,7 +12,7 @@ const port = 3000;
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// --- ROTAS DE AUTENTICAÇÃO ---
+
 
 // Rota de Registro
 app.post("/api/register", async (req, res) => {
@@ -92,7 +92,6 @@ app.post("/api/login", async (req, res) => {
 });
 
 
-// --- ROTAS DE DADOS (PRODUTOS E CATEGORIAS) ---
 
 // Rota para buscar TODOS os produtos
 app.get("/api/products", async (req, res) => {
@@ -112,14 +111,11 @@ app.get("/api/products", async (req, res) => {
     }
 });
 
-// ========================================================================
-// ROTA PARA BUSCAR TODAS AS CATEGORIAS (ADICIONADA PARA CORRIGIR O ERRO)
-// ========================================================================
 app.get("/api/categorias", async (req, res) => {
     try {
         // Busca todas as entradas da tabela 'categorias' no Supabase
         const { data, error } = await supabase
-            .from('categorias') // VERIFIQUE: O nome da sua tabela é 'categorias'?
+            .from('categorias') 
             .select('*');
 
         if (error) {
@@ -135,18 +131,11 @@ app.get("/api/categorias", async (req, res) => {
     }
 });
 
-// ====================================================================================
-// ROTA PARA BUSCAR PRODUTOS DE UMA CATEGORIA ESPECÍFICA (ADICIONADA PREVENTIVAMENTE)
-// ====================================================================================
-// ... (outras rotas) ...
-
-// ROTA PARA BUSCAR PRODUTOS DE UMA CATEGORIA ESPECÍFICA (COM DIAGNÓSTICO)
 app.get("/api/categorias/:slug/produtos", async (req, res) => {
     const { slug } = req.params;
     console.log(`\n--- INICIANDO BUSCA PARA CATEGORIA SLUG: "${slug}" ---`); // LOG 1
 
     try {
-        // Passo 1: Encontrar o ID da categoria com base no slug.
         const { data: categoriaData, error: categoriaError } = await supabase
             .from('categorias')
             .select('id')
@@ -168,7 +157,6 @@ app.get("/api/categorias/:slug/produtos", async (req, res) => {
         
         console.log(`-> Categoria encontrada! ID: ${categoriaData.id}. Buscando produtos...`); // LOG 4
 
-        // Passo 2: Buscar produtos que tenham o ID da categoria correspondente.
         const { data: produtosData, error: produtosError } = await supabase
             .from('produto')
             .select('*')
@@ -188,11 +176,6 @@ app.get("/api/categorias/:slug/produtos", async (req, res) => {
     }
 });
 
-// ... (resto das rotas) ...
-
-// =============================================================================
-// ROTA PARA BUSCAR DADOS DE UMA CATEGORIA ESPECÍFICA (ADICIONADA PREVENTIVAMENTE)
-// =============================================================================
 app.get("/api/categorias/:slug", async (req, res) => {
     const { slug } = req.params;
     try {
@@ -218,12 +201,11 @@ app.get("/api/categorias/:slug", async (req, res) => {
 });
 
 
-// Rota principal que serve o index.html
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Inicia o servidor
+
 app.listen(port, () => {
     console.log(`Servidor rodando em http://localhost:${port}`);
 });
