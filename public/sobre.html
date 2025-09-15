@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nossa História - Alma de Papel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+   
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <a href="index.html" class="logo">
+                <img src="imagens/-1100493983.png" alt="Alma de Papel Logo">
+                <h1>Alma de Papel</h1>
+            </a>
+            <div class="header-actions-container">
+                <form class="search-bar" id="searchBarPage">
+                    <input type="text" id="searchInputPage" placeholder="Buscar...">
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                </form>
+                <div class="header-actions">
+                    <a href="favoritos.html" class="action-link" aria-label="Favoritos"><i class="fas fa-heart"></i></a>
+                    <a href="carrinho.html" class="action-link" aria-label="Carrinho"><i class="fas fa-shopping-cart"></i><span class="cart-count-indicator" id="cart-item-count">0</span></a>
+                    <a href="login.html" class="action-link" aria-label="Minha Conta"><i class="fas fa-user-circle"></i></a>
+                </div>
+                <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu" aria-expanded="false"><i class="fas fa-bars"></i></button>
+            </div>
+            <nav class="main-nav" id="mainNav">
+                 <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="categorias.html">Categorias</a></li>
+                    <li><a href="sobre.html" class="active">Sobre</a></li>
+                    <li><a href="contato.html">Contato</a></li>
+                 </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="about-hero" style="background-image: linear-gradient(#cc4c7f, #D8A7B1), url('imagens/sobre_hero_banner.jpg');"> <!-- Imagem de banner para a página Sobre -->
+            <div class="container">
+                <h1><i class="fas fa-book-heart"></i> A Alma por Trás das Páginas</h1>
+                <p>Uma livraria nascida do amor pela leitura e pelo encanto das palavras.</p>
+                
+            </div>
+        </section>
+
+        <section class="container page-section about-content-detailed">
+            <div class="about-row">
+                <div class="about-text-block">
+                    <h2>Onde Tudo Começou...</h2>
+                    <p>A "Alma de Papel" desabrochou em 2023, como um pequeno broto regado pela paixão de sonhadores que acreditam no poder transformador dos livros. Nossa jornada iniciou-se no universo digital, com um desejo singelo: tecer uma curadoria afetuosa de obras que pudessem tocar corações e despertar a imaginação.</p>
+                    <p>Com o carinho e o entusiasmo da nossa crescente comunidade de leitores, estamos florescendo. Expandimos nossos horizontes literários, sempre com a missão de ser um farol cultural, iluminando mentes e conectando almas através das histórias. Hoje, a Alma de Papel é um refúgio acolhedor para amantes de livros de todos os cantos, um lugar onde clássicos atemporais e pérolas contemporâneas se encontram.</p>
+                </div>
+
+                <div class="about-image-block">
+                    <img src="imagens/biblioteca-aconchegante.jpg" alt="Ambiente aconchegante de uma livraria com livros e plantas">
+                </div>
+            </div>
+
+            <div class="about-row reverse">
+                <div class="about-text-block">
+                    <h2>Nossa Essência e Propósito</h2>
+                    <p><strong>Missão:</strong> Nutrir o amor pela leitura, oferecendo uma experiência de descoberta literária que seja tão encantadora quanto as próprias histórias. Buscamos ser uma ponte afetuosa entre autores e leitores, democratizando o acesso à cultura, ao conhecimento e ao puro deleite de uma boa leitura.</p>
+                    <p><strong>Visão:</strong> Ser reconhecida como a mais charmosa e inspiradora comunidade online para apaixonados por livros no Brasil. Um espaço onde a curadoria é feita com alma, a descoberta é uma constante e a paixão por narrativas é celebrada em cada detalhe. Aspiramos crescer, mantendo sempre a delicadeza e o cuidado que são a nossa assinatura.</p>
+                </div>
+                <div class="about-image-block">
+                    <img src="imagens/livro-brilhando.jpg" alt="Mãos segurando um livro aberto com luz emanando dele">
+                </div>
+            </div>
+
+            <div class="values-section">
+                <h2>Nossos Pilares Encantados</h2>
+                <div class="values-grid">
+                    <div class="value-item">
+                        <i class="fas fa-feather-alt"></i>
+                        <h3>Leveza & Inspiração</h3>
+                        <p>Acreditamos que os livros têm o poder de inspirar e trazer leveza para a vida.</p>
+                    </div>
+                    <div class="value-item">
+                        <i class="fas fa-hand-holding-heart"></i>
+                        <h3>Acolhimento & Cuidado</h3>
+                        <p>Cada leitor é especial. Oferecemos um atendimento atencioso e humanizado.</p>
+                    </div>
+                    <div class="value-item">
+                        <i class="fas fa-gem"></i>
+                        <h3>Curadoria com Alma</h3>
+                        <p>Selecionamos cada título com carinho, buscando qualidade e significado.</p>
+                    </div>
+                    <div class="value-item">
+                        <i class="fas fa-paint-brush"></i>
+                        <h3>Beleza nos Detalhes</h3>
+                        <p>Celebramos a estética e a experiência sensorial que a leitura proporciona.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-brand">
+                <a href="index.html" class="logo">
+                    <img src="imagens/Dê_asas_à_sua-removebg-preview.png" alt="Alma de Papel Logo Rodapé">
+                    <h1>Alma de Papel</h1>
+                </a>
+                <p>"Onde cada página é um convite para sonhar."</p>
+                 <div class="social-media">
+                    <a href="#" aria-label="Instagram" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="Facebook" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Pinterest" title="Pinterest"><i class="fab fa-pinterest-p"></i></a>
+                </div>
+            </div>
+            <nav class="footer-nav">
+                <h4>Descubra</h4>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="categorias.html">Categorias</a></li>
+                    <li><a href="favoritos.html">Favoritos</a></li>
+                    <li><a href="sobre.html">Nossa História</a></li>
+                    <li><a href="contato.html">Fale Conosco</a></li>
+                </ul>
+            </nav>
+            <nav class="footer-nav">
+                <h4>Ajuda</h4>
+                <ul>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Envios e Devoluções</a></li>
+                    <li><a href="#">Política de Privacidade</a></li>
+                    <li><a href="#">Termos de Uso</a></li>
+                    <li><a href="login.html">Minha Conta</a></li>
+                </ul>
+            </nav>
+            <div class="contact-info-footer">
+                <h4>Contato Mágico</h4>
+                <p><i class="fas fa-envelope"></i> contos@almadepapel.com</p>
+                <p><i class="fas fa-phone-alt"></i> (11) 91234-5678</p>
+                <p><i class="fas fa-map-marker-alt"></i> Ateliê Online, Brasil</p>
+            </div>
+        </div>
+        <div class="copyright">
+             © <span id="currentYear"></span> Alma de Papel. Feito com amor e um toque de magia.
+        </div>
+    </footer>
+    <script src="js/main.js"></script>
+</body>
+</html>

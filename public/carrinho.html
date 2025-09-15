@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Carrinho - Alma de Papel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <a href="index.html" class="logo">
+                <img src="imagens/-1100493983.png" alt="Alma de Papel Logo">
+                <h1>Alma de Papel</h1>
+            </a>
+            <div class="header-actions-container">
+                <form class="search-bar" id="searchBarPage">
+                    <input type="text" id="searchInputPage" placeholder="Buscar...">
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                </form>
+                <div class="header-actions">
+                    <a href="favoritos.html" class="action-link" aria-label="Favoritos"><i class="fas fa-heart"></i></a>
+                    <a href="carrinho.html" class="action-link active" aria-label="Carrinho"><i class="fas fa-shopping-cart"></i><span class="cart-count-indicator" id="cart-item-count">0</span></a>
+                    <a href="login.html" class="action-link" aria-label="Minha Conta"><i class="fas fa-user-circle"></i></a>
+                </div>
+                <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu" aria-expanded="false"><i class="fas fa-bars"></i></button>
+            </div>
+            <nav class="main-nav" id="mainNav">
+                 <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="categorias.html">Categorias</a></li>
+                    <li><a href="sobre.html">Sobre</a></li>
+                    <li><a href="contato.html">Contato</a></li>
+                 </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="container page-section">
+            <div class="page-header">
+                <h2 class="page-title"><i class="fas fa-shopping-bag"></i> Meu Cesto de Tesouros</h2>
+                <p class="page-description">Confira os livros que você escolheu para sua jornada literária.</p>
+            </div>
+
+            <div class="cart-content" id="cartContent">
+                <!-- Tabela de itens do carrinho -->
+                <table class="cart-table hidden" id="cartTable">
+                    <thead>
+                        <tr>
+                            <th>Produto</th>
+                            <th>Preço Unit.</th>
+                            <th>Quantidade</th>
+                            <th>Subtotal</th>
+                            <th>Remover</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cartTableBody">
+                        <!-- Itens do carrinho serão inseridos aqui -->
+                    </tbody>
+                </table>
+
+                <!-- Resumo do pedido -->
+                <div class="cart-summary-wrapper hidden" id="cartSummaryWrapper">
+                    <div class="cart-summary">
+                        <h3>Resumo da Magia</h3>
+                        <div class="summary-row">
+                            <span>Subtotal:</span>
+                            <span id="cartSubtotal">R$ 0,00</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Frete:</span>
+                            <span>A calcular</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Total:</span>
+                            <span id="cartTotal">R$ 0,00</span>
+                        </div>
+                        <div class="cart-actions">
+                            <a href="index.html" class="btn btn-secondary">Continuar Encantando-se</a>
+                            <button class="btn btn-primary" id="checkoutButton">Finalizar Pedido <i class="fas fa-magic"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mensagem de carrinho vazio -->
+                <div class="empty-state-notice" id="emptyCartMessage">
+                    <img src="imagens/download.png" alt="Carrinho Vazio"> <!-- CRIE ESSA IMAGEM -->
+                    <h3>Seu cesto de tesouros está vazio!</h3>
+                    <p>Que tal adicionar algumas histórias para colorir seus dias?</p>
+                    <a href="index.html" class="btn btn-primary"><i class="fas fa-book-open"></i> Explorar Livraria</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-brand">
+                <a href="index.html" class="logo">
+                    <img src="imagens/Dê_asas_à_sua-removebg-preview.png" alt="Alma de Papel Logo Rodapé">
+                    <h1>Alma de Papel</h1>
+                </a>
+                <p>"Onde cada página é um convite para sonhar."</p>
+                 <div class="social-media">
+                    <a href="#" aria-label="Instagram" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="Facebook" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Pinterest" title="Pinterest"><i class="fab fa-pinterest-p"></i></a>
+                </div>
+            </div>
+            <nav class="footer-nav">
+                <h4>Descubra</h4>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="categorias.html">Categorias</a></li>
+                    <li><a href="favoritos.html">Favoritos</a></li>
+                    <li><a href="sobre.html">Nossa História</a></li>
+                    <li><a href="contato.html">Fale Conosco</a></li>
+                </ul>
+            </nav>
+            <nav class="footer-nav">
+                <h4>Ajuda</h4>
+                <ul>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Envios e Devoluções</a></li>
+                    <li><a href="#">Política de Privacidade</a></li>
+                    <li><a href="#">Termos de Uso</a></li>
+                    <li><a href="login.html">Minha Conta</a></li>
+                </ul>
+            </nav>
+            <div class="contact-info-footer">
+                <h4>Contato Mágico</h4>
+                <p><i class="fas fa-envelope"></i> contos@almadepapel.com</p>
+                <p><i class="fas fa-phone-alt"></i> (11) 91234-5678</p>
+                <p><i class="fas fa-map-marker-alt"></i> Ateliê Online, Brasil</p>
+            </div>
+        </div>
+        <div class="copyright">
+             © <span id="currentYear"></span> Alma de Papel. Feito com amor e um toque de magia.
+        </div>
+    </footer>
+    <script src="js/main.js"></script>
+</body>
+</html>

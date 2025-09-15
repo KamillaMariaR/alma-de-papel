@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fale Conosco - Alma de Papel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Font Awesome é importante para os ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <a href="index.html" class="logo">
+                <img src="imagens/-1100493983.png" alt="Alma de Papel Logo">
+                <h1>Alma de Papel</h1>
+            </a>
+            <div class="header-actions-container">
+                <form class="search-bar" id="searchBarPage">
+                    <input type="text" id="searchInputPage" placeholder="Buscar...">
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                </form>
+                <div class="header-actions">
+                    <a href="favoritos.html" class="action-link" aria-label="Favoritos"><i class="fas fa-heart"></i></a>
+                    <a href="carrinho.html" class="action-link" aria-label="Carrinho"><i class="fas fa-shopping-cart"></i><span class="cart-count-indicator" id="cart-item-count">0</span></a>
+                    <a href="login.html" class="action-link" aria-label="Minha Conta"><i class="fas fa-user-circle"></i></a>
+                </div>
+                <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu" aria-expanded="false"><i class="fas fa-bars"></i></button>
+            </div>
+            <nav class="main-nav" id="mainNav">
+                 <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="categorias.html">Categorias</a></li>
+                    <li><a href="sobre.html">Sobre</a></li>
+                    <li><a href="contato.html" class="active">Contato</a></li>
+                 </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="page-section contact-page">
+            <div class="container">
+                <div class="page-header">
+                    <h2 class="page-title"><i class="fas fa-feather-alt"></i> Um Olá Carinhoso da Alma de Papel</h2>
+                    <p class="page-description">Adoramos ouvir você! Seja para uma dúvida, sugestão, um simples "oi" ou para compartilhar suas leituras, este cantinho é todo seu.</p>
+                </div>
+
+                <div id="contactFormFeedback" class="feedback-message-container" style="max-width: 700px; margin: 0 auto 30px auto;"></div>
+
+                <div class="contact-layout">
+                    <div class="contact-form-container">
+                        <h3><i class="fas fa-paper-plane"></i> Envie-nos uma Mensagem</h3>
+                        <form class="contact-page-form" id="contactForm">
+                            <div class="form-group">
+                                <label for="contact-name">Seu Nome Encantado:</label>
+                                <input type="text" id="contact-name" name="contact-name" placeholder="Como podemos te chamar?" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="contact-email">Seu E-mail Mágico:</label>
+                                <input type="email" id="contact-email" name="contact-email" placeholder="Para onde enviaremos nossa resposta?" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="contact-subject">Assunto da Conversa:</label>
+                                <input type="text" id="contact-subject" name="contact-subject" placeholder="Sobre o que gostaria de falar?">
+                            </div>
+                            <div class="form-group">
+                                <label for="contact-message">Sua Mensagem Detalhada:</label>
+                                <textarea id="contact-message" name="contact-message" rows="6" placeholder="Escreva aqui suas palavras..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-submit"><i class="fas fa-envelope"></i> Enviar Pergaminho</button>
+                        </form>
+                    </div>
+
+                    <aside class="contact-info-sidebar">
+                        <h3><i class="fas fa-map-signs"></i> Nossos Pontos de Encontro</h3>
+                        
+                        <div class="contact-details-item">
+                            <span class="icon-contact"><i class="fas fa-envelope-open-text"></i></span>
+                            <div>
+                                <strong>E-mail para Contos:</strong>
+                                <p><a href="mailto:contos@almadepapel.com">contos@almadepapel.com</a></p>
+                                <p class="small-text">Para dúvidas, sugestões e parcerias.</p>
+                            </div>
+                        </div>
+
+                        <div class="contact-details-item">
+                            <span class="icon-contact"><i class="fas fa-phone-volume"></i></span>
+                            <div>
+                                <strong>Telefone para Sussurros:</strong>
+                                <p>(11) 91234-5678</p>
+                                <p class="small-text">Atendimento de Seg. a Sex. das 9h às 18h.</p>
+                            </div>
+                        </div>
+
+                        <div class="contact-details-item">
+                            <span class="icon-contact"><i class="fas fa-map-marker-alt"></i></span>
+                            <div>
+                                <strong>Nosso Ateliê (Online):</strong>
+                                <p>Brasil - Enviando magia para todos os cantos!</p>
+                                <p class="small-text">Por enquanto, nossa loja é um refúgio virtual.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-details-item">
+                            <span class="icon-contact"><i class="fas fa-question-circle"></i></span>
+                            <div>
+                                <strong>Perguntas Frequentes:</strong>
+                                <p><a href="#">Visite nosso FAQ</a></p>
+                                <p class="small-text">Talvez sua dúvida já tenha sido respondida por lá!</p>
+                            </div>
+                        </div>
+
+                        <div class="social-media-contact-page">
+                            <h4>Siga Nossas Aventuras:</h4>
+                            <a href="#" aria-label="Instagram" title="Instagram"><i class="fab fa-instagram"></i></a>
+                            <a href="#" aria-label="Facebook" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" aria-label="Pinterest" title="Pinterest"><i class="fab fa-pinterest-p"></i></a>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-brand">
+                <a href="index.html" class="logo">
+                    <img src="imagens/Dê_asas_à_sua-removebg-preview.png" alt="Alma de Papel Logo Rodapé">
+                    <h1>Alma de Papel</h1>
+                </a>
+                <p>"Onde cada página é um convite para sonhar."</p>
+                 <div class="social-media">
+                    <a href="#" aria-label="Instagram" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="Facebook" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Pinterest" title="Pinterest"><i class="fab fa-pinterest-p"></i></a>
+                </div>
+            </div>
+            <nav class="footer-nav">
+                <h4>Descubra</h4>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="categorias.html">Categorias</a></li>
+                    <li><a href="favoritos.html">Favoritos</a></li>
+                    <li><a href="sobre.html">Nossa História</a></li>
+                    <li><a href="contato.html">Fale Conosco</a></li>
+                </ul>
+            </nav>
+            <nav class="footer-nav">
+                <h4>Ajuda</h4>
+                <ul>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Envios e Devoluções</a></li>
+                    <li><a href="#">Política de Privacidade</a></li>
+                    <li><a href="#">Termos de Uso</a></li>
+                    <li><a href="login.html">Minha Conta</a></li>
+                </ul>
+            </nav>
+            <div class="contact-info-footer">
+                <h4>Contato Mágico</h4>
+                <p><i class="fas fa-envelope"></i> contos@almadepapel.com</p>
+                <p><i class="fas fa-phone-alt"></i> (11) 91234-5678</p>
+                <p><i class="fas fa-map-marker-alt"></i> Ateliê Online, Brasil</p>
+            </div>
+        </div>
+        <div class="copyright">
+             © <span id="currentYear"></span> Alma de Papel. Feito com amor e um toque de magia.
+        </div>
+    </footer>
+    <script src="js/main.js"></script>
+</body>
+</html>
