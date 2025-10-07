@@ -2031,3 +2031,139 @@ footer {
         flex-basis: 100%;
     }
 }
+/* ============================================= */
+/*          ESTILOS DA PÁGINA DE ADMIN           */
+/* ============================================= */
+
+.admin-header {
+    background-color: #5C5470;
+    color: white;
+    padding: 20px 0;
+}
+
+.admin-header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.admin-header h1 {
+    color: white;
+    margin: 0;
+    font-size: 1.6em;
+}
+
+.admin-header a, .admin-header button {
+    color: white;
+    font-weight: bold;
+    margin-left: 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1em;
+}
+.admin-header a:hover, .admin-header button:hover {
+    text-decoration: underline;
+}
+
+.admin-container {
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+
+.admin-section {
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+    margin-bottom: 40px;
+}
+
+.admin-section h2 {
+    color: #cc4c7f;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+}
+
+.admin-form-container, .admin-table-container {
+    margin-bottom: 30px;
+}
+
+.admin-form-container h3, .admin-table-container h3 {
+    color: #5C5470;
+    margin-bottom: 20px;
+    font-size: 1.4em;
+}
+
+.admin-form .form-group {
+    margin-bottom: 18px;
+}
+
+.admin-form label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: bold;
+    font-size: 0.9em;
+}
+
+.admin-form input[type="text"],
+.admin-form input[type="url"],
+.admin-form input[type="number"],
+.admin-form select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #D3C5C1;
+    border-radius: 6px;
+    font-size: 1em;
+}
+
+.admin-form-actions {
+    margin-top: 20px;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-table th, .admin-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #EAE0D5;
+    text-align: left;
+}
+
+.admin-table th {
+    background-color: #f9f6f3;
+    font-weight: bold;
+}
+
+.admin-table tbody tr:hover {
+    background-color: #FCFBF9;
+}
+
+.product-info-cell {
+    display: flex;
+    align-items: center;
+}
+.product-info-cell img {
+    margin-right: 15px;
+    border-radius: 4px;
+    border: 1px solid #eee;
+}
+
+.actions-cell .btn-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2em;
+    padding: 5px;
+    margin: 0 5px;
+    color: #a0a0a0;
+}
+.actions-cell .btn-icon.edit-btn:hover {
+    color: #5C5470;
+}
+.actions-cell .btn-icon.delete-btn:hover {
+    color: #d9534f;
+}

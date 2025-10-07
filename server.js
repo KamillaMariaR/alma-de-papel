@@ -1,23 +1,44 @@
+// ARQUIVO: server.js (VERSÃO FINAL COMPLETA, COM ROTA DE TESTE)
 
-
-require('dotenv').config(); // Garante que as variáveis de ambiente sejam carregadas
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const supabase = require('./database.js');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 const port = 3000;
 
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// --- Middleware de Autenticação ---
+const authenticateToken = (req, res, next) => {
+    const token = req.cookies.token;
+    if (token == null) return res.sendStatus(401);
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        if (err) return res.sendStatus(403);
+        req.user = user;
+        next();
+    });
+};
+
+const isAdmin = (req, res, next) => {
+    if (req.user && req.user.role === 'admin') {
+        next();
+    } else {
+        res.status(403).json({ message: 'Acesso negado. Rota somente para administradores.' });
+    }
+};
 
 
-// Rota de Registro
+// --- Rotas de Autenticação ---
 app.post("/api/register", async (req, res) => {
     const { name, email, password, confirmPassword } = req.body;
-    console.log('Dados recebidos:', { name, email, password, confirmPassword });
 
     if (!name || !email || !password) {
         return res.status(400).json({ message: 'Por favor, preencha todos os campos.' });
@@ -33,9 +54,7 @@ app.post("/api/register", async (req, res) => {
             .eq('email', email)
             .single();
 
-        if (selectError && selectError.code !== 'PGRST116') {
-            throw selectError;
-        }
+        if (selectError && selectError.code !== 'PGRST116') throw selectError;
         if (existingUser) {
             return res.status(400).json({ message: 'Este e-mail já está cadastrado.' });
         }
@@ -45,11 +64,9 @@ app.post("/api/register", async (req, res) => {
 
         const { error: insertError } = await supabase
             .from('users')
-            .insert({ name: name, email: email, password: password_hash });
+            .insert({ name: name, email: email, password: password_hash, role: 'user' });
 
-        if (insertError) {
-            throw insertError;
-        }
+        if (insertError) throw insertError;
 
         res.status(201).json({ message: 'Cadastro realizado com sucesso!' });
     } catch (error) {
@@ -58,10 +75,8 @@ app.post("/api/register", async (req, res) => {
     }
 });
 
-// Rota de Login
 app.post("/api/login", async (req, res) => {
     const { email, password } = req.body;
-    console.log('Dados de login recebidos:', { email, password });
 
     if (!email || !password) {
         return res.status(400).json({ message: 'Por favor, preencha todos os campos.' });
@@ -81,7 +96,16 @@ app.post("/api/login", async (req, res) => {
         const isPasswordCorrect = bcrypt.compareSync(password, user.password);
 
         if (isPasswordCorrect) {
-            res.status(200).json({ message: 'Login bem-sucedido!' });
+            const userPayload = { id: user.id, name: user.name, email: user.email, role: user.role };
+            const token = jwt.sign(userPayload, process.env.JWT_SECRET, { expiresIn: '1d' });
+
+            res.cookie('token', token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                maxAge: 24 * 60 * 60 * 1000
+            });
+
+            res.status(200).json({ message: 'Login bem-sucedido!', user: userPayload });
         } else {
             res.status(401).json({ message: 'E-mail ou senha inválidos.' });
         }
@@ -91,19 +115,79 @@ app.post("/api/login", async (req, res) => {
     }
 });
 
+app.get("/api/session", authenticateToken, (req, res) => {
+    res.status(200).json({ user: req.user });
+});
+
+app.post("/api/logout", (req, res) => {
+    res.clearCookie('token');
+    res.status(200).json({ message: 'Logout bem-sucedido.' });
+});
 
 
-// Rota para buscar TODOS os produtos
-app.get("/api/products", async (req, res) => {
+// --- Rotas de Admin ---
+app.post("/api/admin/products", authenticateToken, isAdmin, async (req, res) => {
+    const { nome_produto, Autor_produto, imagem_url, categoria_id, preco_produto } = req.body;
+
     try {
         const { data, error } = await supabase
             .from('produto')
-            .select('*');
+            .insert([{ nome_produto, Autor_produto, imagem_url, categoria_id, preco_produto }])
+            .select();
 
-        if (error) {
-            throw error;
+        if (error) throw error;
+        res.status(201).json({ message: 'Livro adicionado com sucesso!', data: data[0] });
+    } catch (error) {
+        console.error('!!! ERRO DETALHADO AO ADICIONAR PRODUTO:', error);
+        res.status(500).json({ message: 'Erro no servidor ao adicionar produto.' });
+    }
+});
+
+app.put("/api/admin/products/:id", authenticateToken, isAdmin, async (req, res) => {
+    const { id } = req.params;
+    const { nome_produto, Autor_produto, imagem_url, categoria_id, preco_produto } = req.body;
+
+    try {
+        const { data, error } = await supabase
+            .from('produto')
+            .update({ nome_produto, Autor_produto, imagem_url, categoria_id, preco_produto })
+            .eq('id', id)
+            .select();
+
+        if (error) throw error;
+        if (!data || data.length === 0) {
+            return res.status(404).json({ message: 'Produto não encontrado.' });
         }
-        
+        res.status(200).json({ message: 'Livro atualizado com sucesso!', data: data[0] });
+    } catch (error) {
+        console.error(`Erro ao atualizar produto ${id}:`, error.message);
+        res.status(500).json({ message: 'Erro no servidor ao atualizar produto.' });
+    }
+});
+
+app.delete("/api/admin/products/:id", authenticateToken, isAdmin, async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const { error } = await supabase
+            .from('produto')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw error;
+        res.status(200).json({ message: 'Livro excluído com sucesso!' });
+    } catch (error) {
+        console.error(`Erro ao deletar produto ${id}:`, error.message);
+        res.status(500).json({ message: 'Erro no servidor ao deletar produto.' });
+    }
+});
+
+
+// --- Rotas Públicas ---
+app.get("/api/products", async (req, res) => {
+    try {
+        const { data, error } = await supabase.from('produto').select('*');
+        if (error) throw error;
         res.json(data);
     } catch (error) {
         console.error('Erro ao buscar produtos:', error.message);
@@ -113,18 +197,9 @@ app.get("/api/products", async (req, res) => {
 
 app.get("/api/categorias", async (req, res) => {
     try {
-        // Busca todas as entradas da tabela 'categorias' no Supabase
-        const { data, error } = await supabase
-            .from('categorias') 
-            .select('*');
-
-        if (error) {
-            throw error;
-        }
-        
-        // Envia os dados das categorias como resposta JSON
+        const { data, error } = await supabase.from('categorias').select('*');
+        if (error) throw error;
         res.json(data);
-
     } catch (error) {
         console.error('Erro ao buscar categorias:', error.message);
         res.status(500).json({ error: 'Erro ao buscar categorias do banco de dados.' });
@@ -133,45 +208,19 @@ app.get("/api/categorias", async (req, res) => {
 
 app.get("/api/categorias/:slug/produtos", async (req, res) => {
     const { slug } = req.params;
-    console.log(`\n--- INICIANDO BUSCA PARA CATEGORIA SLUG: "${slug}" ---`); // LOG 1
-
     try {
         const { data: categoriaData, error: categoriaError } = await supabase
-            .from('categorias')
-            .select('id')
-            .eq('slug', slug)
-            .single();
-
-        // LOG para verificar se a categoria foi encontrada
-        console.log("Resultado da busca pela categoria:", { categoriaData, categoriaError }); // LOG 2
-
-        if (categoriaError && categoriaError.code !== 'PGRST116') {
-             // Ignora o erro "not found" mas loga outros
-            throw categoriaError;
-        }
-
-        if (!categoriaData) {
-            console.log("-> Categoria NÃO encontrada. Verifique o slug e as políticas de RLS."); // LOG 3
-            return res.status(404).json({ message: 'Categoria não encontrada.' });
-        }
+            .from('categorias').select('id').eq('slug', slug).single();
+        if (categoriaError && categoriaError.code !== 'PGRST116') throw categoriaError;
+        if (!categoriaData) return res.status(404).json({ message: 'Categoria não encontrada.' });
         
-        console.log(`-> Categoria encontrada! ID: ${categoriaData.id}. Buscando produtos...`); // LOG 4
-
         const { data: produtosData, error: produtosError } = await supabase
-            .from('produto')
-            .select('*')
-            .eq('categoria_id', categoriaData.id);
-
-        // LOG para verificar o resultado da busca de produtos
-        console.log("Resultado da busca por produtos:", { produtosData, produtosError }); // LOG 5
-
+            .from('produto').select('*').eq('categoria_id', categoriaData.id);
         if (produtosError) throw produtosError;
         
-        console.log(`--- FIM DA BUSCA. Encontrados ${produtosData.length} produtos. ---\n`); // LOG 6
         res.json(produtosData);
-
     } catch (error) {
-        console.error(`!!! ERRO na rota da categoria ${slug}:`, error.message); // LOG DE ERRO
+        console.error(`!!! ERRO na rota da categoria ${slug}:`, error.message);
         res.status(500).json({ error: 'Erro ao buscar produtos da categoria.' });
     }
 });
@@ -179,16 +228,8 @@ app.get("/api/categorias/:slug/produtos", async (req, res) => {
 app.get("/api/categorias/:slug", async (req, res) => {
     const { slug } = req.params;
     try {
-        const { data, error } = await supabase
-            .from('categorias')
-            .select('*')
-            .eq('slug', slug)
-            .single();
-
-        if (error) {
-            throw error;
-        }
-
+        const { data, error } = await supabase.from('categorias').select('*').eq('slug', slug).single();
+        if (error) throw error;
         if (data) {
             res.json(data);
         } else {
@@ -200,10 +241,10 @@ app.get("/api/categorias/:slug", async (req, res) => {
     }
 });
 
-
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
+
 
 
 app.listen(port, () => {

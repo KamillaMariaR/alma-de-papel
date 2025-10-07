@@ -1,0 +1,82 @@
+<!-- START OF FILE public/perfil.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha Conta - Alma de Papel</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <!-- (O header pode ser igual ao das outras páginas) -->
+        <div class="container header-content">
+            <a href="index.html" class="logo">
+                <img src="imagens/-1100493983.png" alt="Alma de Papel Logo">
+                <h1>Alma de Papel</h1>
+            </a>
+            <div class="header-actions-container">
+                <div class="header-actions">
+                    <a href="favoritos.html" class="action-link" aria-label="Favoritos"><i class="fas fa-heart"></i></a>
+                    <a href="carrinho.html" class="action-link" aria-label="Carrinho"><i class="fas fa-shopping-cart"></i><span class="cart-count-indicator" id="cart-item-count">0</span></a>
+                    <a href="perfil.html" id="user-account-link" class="action-link active" aria-label="Minha Conta"><i class="fas fa-user-circle"></i></a>
+                </div>
+                <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+            </div>
+            <nav class="main-nav" id="mainNav">
+                 <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="categorias.html">Categorias</a></li>
+                    <li><a href="sobre.html">Sobre</a></li>
+                    <li><a href="contato.html">Contato</a></li>
+                 </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="container page-section">
+            <div class="page-header">
+                <h2 class="page-title"><i class="fas fa-user-edit"></i> Meu Cantinho Mágico</h2>
+                <p class="page-description" id="welcomeMessage">Olá! Que bom te ver por aqui.</p>
+            </div>
+
+            <div class="auth-form" style="max-width: 600px; margin: 0 auto;">
+                <h3>Meus Dados</h3>
+                <div class="form-group">
+                    <label>Nome:</label>
+                    <p id="userName" style="font-size: 1.1em;">Carregando...</p>
+                </div>
+                <div class="form-group">
+                    <label>E-mail:</label>
+                    <p id="userEmail" style="font-size: 1.1em;">Carregando...</p>
+                </div>
+
+                <div id="admin-link-container" class="hidden" style="margin-top: 20px;">
+                    <a href="admin.html" class="btn btn-secondary"><i class="fas fa-shield-alt"></i> Acessar Painel de Admin</a>
+                </div>
+
+                <button id="logoutButton" class="btn btn-submit" style="background-color: #aaa; margin-top: 30px;">
+                    <i class="fas fa-sign-out-alt"></i> Sair da Conta
+                </button>
+            </div>
+        </section>
+    </main>
+    
+    <!-- (O footer pode ser igual ao das outras páginas) -->
+    <footer>
+         <div class="container footer-content">
+            <div class="footer-brand">
+                 <a href="index.html" class="logo">
+                    <img src="imagens/Dê_asas_à_sua-removebg-preview.png" alt="Alma de Papel Logo Rodapé">
+                </a>
+            </div>
+        </div>
+        <div class="copyright">
+             © <span id="currentYear"></span> Alma de Papel. Feito com amor e um toque de magia.
+        </div>
+    </footer>
+    <script src="js/main.js"></script>
+</body>
+</html>
