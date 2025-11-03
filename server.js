@@ -1,5 +1,3 @@
-// ARQUIVO: server.js (VERSÃO FINAL COMPLETA, COM ROTA DE TESTE)
-
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
@@ -54,7 +52,7 @@ app.post("/api/register", async (req, res) => {
             .eq('email', email)
             .single();
 
-        if (selectError && selectError.code !== 'PGRST116') throw selectError;
+        if (selectError && selectError.code !== 'PGRST116') throw selectError; // PGRST116 means no rows found
         if (existingUser) {
             return res.status(400).json({ message: 'Este e-mail já está cadastrado.' });
         }
@@ -129,13 +127,21 @@ app.post("/api/logout", (req, res) => {
 app.post("/api/admin/products", authenticateToken, isAdmin, async (req, res) => {
     const { nome_produto, Autor_produto, imagem_url, categoria_id, preco_produto } = req.body;
 
+    // Basic validation
+    if (!nome_produto || !Autor_produto || !imagem_url || !categoria_id || preco_produto === undefined) {
+        return res.status(400).json({ message: 'Todos os campos do produto são obrigatórios.' });
+    }
+
     try {
         const { data, error } = await supabase
             .from('produto')
             .insert([{ nome_produto, Autor_produto, imagem_url, categoria_id, preco_produto }])
             .select();
 
-        if (error) throw error;
+        if (error) {
+            console.error('Erro Supabase ao adicionar produto:', error); // Log detailed Supabase error
+            throw new Error(`Erro no banco de dados: ${error.message}`);
+        }
         res.status(201).json({ message: 'Livro adicionado com sucesso!', data: data[0] });
     } catch (error) {
         console.error('!!! ERRO DETALHADO AO ADICIONAR PRODUTO:', error);
@@ -147,6 +153,11 @@ app.put("/api/admin/products/:id", authenticateToken, isAdmin, async (req, res) 
     const { id } = req.params;
     const { nome_produto, Autor_produto, imagem_url, categoria_id, preco_produto } = req.body;
 
+    // Basic validation
+    if (!nome_produto || !Autor_produto || !imagem_url || !categoria_id || preco_produto === undefined) {
+        return res.status(400).json({ message: 'Todos os campos do produto são obrigatórios.' });
+    }
+
     try {
         const { data, error } = await supabase
             .from('produto')
@@ -154,7 +165,10 @@ app.put("/api/admin/products/:id", authenticateToken, isAdmin, async (req, res) 
             .eq('id', id)
             .select();
 
-        if (error) throw error;
+        if (error) {
+            console.error('Erro Supabase ao atualizar produto:', error); // Log detailed Supabase error
+            throw new Error(`Erro no banco de dados: ${error.message}`);
+        }
         if (!data || data.length === 0) {
             return res.status(404).json({ message: 'Produto não encontrado.' });
         }
@@ -174,7 +188,12 @@ app.delete("/api/admin/products/:id", authenticateToken, isAdmin, async (req, re
             .delete()
             .eq('id', id);
 
-        if (error) throw error;
+        if (error) {
+            console.error('Erro Supabase ao deletar produto:', error); // Log detailed Supabase error
+            throw new Error(`Erro no banco de dados: ${error.message}`);
+        }
+        // Check if any row was actually deleted (Supabase doesn't return data on delete by default)
+        // You might need to check the error object or perform a select before delete if strict check is needed.
         res.status(200).json({ message: 'Livro excluído com sucesso!' });
     } catch (error) {
         console.error(`Erro ao deletar produto ${id}:`, error.message);
@@ -195,6 +214,29 @@ app.get("/api/products", async (req, res) => {
     }
 });
 
+// NOVO ENDPOINT DE BUSCA
+app.get("/api/products/search", async (req, res) => {
+    const { query } = req.query; // Pega o termo de busca da query string (ex: ?query=harry)
+    if (!query) {
+        return res.status(400).json({ message: 'Parâmetro de busca "query" é obrigatório.' });
+    }
+
+    try {
+        const { data, error } = await supabase
+            .from('produto')
+            .select('*')
+            // Usa 'ilike' para busca case-insensitive e '%' para correspondência parcial
+            .or(`nome_produto.ilike.%${query}%,Autor_produto.ilike.%${query}%`);
+
+        if (error) throw error;
+        res.json(data);
+    } catch (error) {
+        console.error('Erro ao buscar produtos:', error.message);
+        res.status(500).json({ error: 'Erro ao buscar produtos do banco de dados.' });
+    }
+});
+
+
 app.get("/api/categorias", async (req, res) => {
     try {
         const { data, error } = await supabase.from('categorias').select('*');
@@ -211,7 +253,7 @@ app.get("/api/categorias/:slug/produtos", async (req, res) => {
     try {
         const { data: categoriaData, error: categoriaError } = await supabase
             .from('categorias').select('id').eq('slug', slug).single();
-        if (categoriaError && categoriaError.code !== 'PGRST116') throw categoriaError;
+        if (categoriaError && categoriaError.code !== 'PGRST116') throw categoriaError; // PGRST116 means no rows found
         if (!categoriaData) return res.status(404).json({ message: 'Categoria não encontrada.' });
         
         const { data: produtosData, error: produtosError } = await supabase
@@ -245,6 +287,10 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// Adicione esta rota para a nova página de busca
+app.get('/busca.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'busca.html'));
+});
 
 
 app.listen(port, () => {

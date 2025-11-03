@@ -1,20 +1,15 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meus Favoritos - Alma de Papel</title>
+    <title>Busca por "" - Alma de Papel</title> <!-- O título será atualizado via JS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:wght@400;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
 </head>
-
 <body>
     <header>
         <div class="container header-content">
@@ -28,24 +23,19 @@
                     <button type="submit"><i class="fas fa-search"></i></button>
                 </form>
                 <div class="header-actions">
-                    <a href="favoritos.html" class="action-link active" aria-label="Favoritos"><i
-                            class="fas fa-heart"></i></a>
-                    <a href="carrinho.html" class="action-link" aria-label="Carrinho"><i
-                            class="fas fa-shopping-cart"></i><span class="cart-count-indicator"
-                            id="cart-item-count">0</span></a>
-                   <a href="login.html" id="user-account-link" class="action-link" aria-label="Minha Conta"><i class="fas fa-user-circle"></i></a>
-
+                    <a href="favoritos.html" class="action-link" aria-label="Favoritos"><i class="fas fa-heart"></i></a>
+                    <a href="carrinho.html" class="action-link" aria-label="Carrinho"><i class="fas fa-shopping-cart"></i><span class="cart-count-indicator" id="cart-item-count">0</span></a>
+                    <a href="login.html" id="user-account-link" class="action-link" aria-label="Minha Conta"><i class="fas fa-user-circle"></i></a>
                 </div>
-                <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu" aria-expanded="false"><i
-                        class="fas fa-bars"></i></button>
+                <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu" aria-expanded="false"><i class="fas fa-bars"></i></button>
             </div>
             <nav class="main-nav" id="mainNav">
-                <ul>
+                 <ul>
                     <li><a href="index.html">Home</a></li>
                     <li><a href="categorias.html">Categorias</a></li>
                     <li><a href="sobre.html">Sobre</a></li>
                     <li><a href="contato.html">Contato</a></li>
-                </ul>
+                 </ul>
             </nav>
         </div>
     </header>
@@ -53,33 +43,31 @@
     <main>
         <section class="container page-section">
             <div class="page-header">
-                <h2 class="page-title"><i class="fas fa-heart-sparkle"></i> Livros que Tocaram seu Coração</h2>
-                <p class="page-description">Sua prateleira virtual de leituras mais queridas e inspiradoras.</p>
+                <h2 class="page-title"><i class="fas fa-search"></i> Resultados da Busca por "<span id="searchQueryDisplay"></span>"</h2>
+                <p class="page-description" id="searchResultDescription">Encontramos os seguintes tesouros para você:</p>
             </div>
 
-            <div id="feedbackMessageFavorites" class="feedback-message-container"></div>
+            <div id="feedbackMessageContainer" class="feedback-message-container"></div>
 
-            <div class="products-container" id="favoritesContainer">
+            <div class="products-container" id="productsContainer">
+                <p class="text-center" style="grid-column: 1 / -1;">Buscando seus livros...</p>
             </div>
-
-            <div class="empty-state-notice hidden" id="emptyFavoritesMessage">
-                <img src="imagens/coracao.png" alt="Nenhum favorito">
-                <h3>Sua lista de desejos está um pouco solitária!</h3>
-                <p>Explore nossa coleção e adicione os livros que fazem seu coração bater mais forte <i
-                        class="fas fa-heart" style="color: #D8A7B1;"></i>.</p>
-                <a href="index.html" class="btn btn-primary" style="margin-top:15px;"><i class="fas fa-search"></i>
-                    Encontrar Tesouros</a>
+             <div class="text-center" style="margin-top: 40px;">
+                <button id="loadMoreBtn" class="btn btn-secondary hidden">
+                    <i class="fas fa-plus"></i> Ver Mais Resultados
+                </button>
             </div>
         </section>
     </main>
 
-        <footer>
+   <footer>
         <div class="container footer-content">
             <div class="footer-brand">
                 <a href="index.html" class="logo">
                     <img src="imagens/-1100493983.png" alt="Alma de Papel Logo Rodapé">
                     <h1>Alma de Papel</h1>
                 </a>
+                
             </div>
             <nav class="footer-nav">
                 <h4>Descubra</h4>
@@ -106,5 +94,4 @@
     </footer>
     <script src="js/main.js"></script>
 </body>
-
 </html>

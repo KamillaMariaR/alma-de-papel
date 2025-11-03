@@ -1,7 +1,7 @@
 let currentUser = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-    let allProducts = [];
+    let allProducts = []; // Pode conter todos os produtos ou resultados de busca, dependendo da página
     const productsContainer = document.getElementById('productsContainer');
     const cartItemCountElement = document.getElementById('cart-item-count');
     const mainNav = document.getElementById('mainNav');
@@ -9,13 +9,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const currentYearElement = document.getElementById('currentYear');
     const productsPerPage = 8;
     let currentlyLoadedCount = 0;
-    
+
+    // Elementos da barra de pesquisa (adicionados aqui para serem globais no DOMContentLoaded)
+    const searchBarPage = document.getElementById('searchBarPage');
+    const searchInputPage = document.getElementById('searchInputPage');
+
     let cart = loadCart();
     let favorites = loadFavorites();
     updateCartCount();
 
     if (currentYearElement) {
         currentYearElement.textContent = new Date().getFullYear();
+    }
+
+    // Event listener para a barra de pesquisa
+    if (searchBarPage) {
+        searchBarPage.addEventListener('submit', (e) => {
+            e.preventDefault(); // Impede o envio padrão do formulário
+            const searchTerm = searchInputPage.value.trim();
+            if (searchTerm) {
+                // Redireciona para a página de busca com o termo na URL
+                window.location.href = `busca.html?query=${encodeURIComponent(searchTerm)}`;
+            }
+        });
     }
 
     async function checkUserSession() {
@@ -33,10 +49,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         updateUIForUser();
     }
-    
+
     function updateUIForUser() {
         const userAccountLinks = document.querySelectorAll('#user-account-link');
         const logoutButton = document.getElementById('logoutButton');
+        const adminLinkContainer = document.getElementById('admin-link-container'); // Adicionado para admin.html
 
         if (currentUser) {
             userAccountLinks.forEach(link => {
@@ -47,15 +64,39 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (window.location.pathname.endsWith('perfil.html')) {
+                // Redireciona admin para o painel de admin
                 if (currentUser.role === 'admin') {
                     window.location.href = 'admin.html';
-                    return; 
+                    return;
                 }
-                
-                document.getElementById('welcomeMessage').textContent = `Olá, ${currentUser.name}! Que bom te ver por aqui.`;
-                document.getElementById('userName').textContent = currentUser.name;
-                document.getElementById('userEmail').textContent = currentUser.email;
+
+                // Atualiza os dados do perfil para usuários normais
+                const welcomeMessageEl = document.getElementById('welcomeMessage');
+                const userNameEl = document.getElementById('userName');
+                const userEmailEl = document.getElementById('userEmail');
+
+                if (welcomeMessageEl) welcomeMessageEl.textContent = `Olá, ${currentUser.name}! Que bom te ver por aqui.`;
+                if (userNameEl) userNameEl.textContent = currentUser.name;
+                if (userEmailEl) userEmailEl.textContent = currentUser.email;
+
+                // Esconde o link de admin se não for admin (já redirecionou acima, mas para garantir)
+                if (adminLinkContainer) {
+                    adminLinkContainer.classList.add('hidden');
+                }
+
+            } else if (window.location.pathname.endsWith('admin.html')) {
+                // Se o usuário está na página admin.html e não é admin, redireciona
+                if (currentUser.role !== 'admin') {
+                    alert('Acesso negado. Esta área é apenas para administradores.');
+                    window.location.href = 'index.html';
+                    return;
+                }
+                // Se é admin, garante que o link de admin não aparece aqui, pois já está na página admin
+                if (adminLinkContainer) {
+                    adminLinkContainer.classList.add('hidden');
+                }
             }
+
 
             if (logoutButton) {
                 logoutButton.addEventListener('click', handleLogout);
@@ -67,7 +108,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     link.setAttribute('aria-label', 'Fazer Login');
                 }
             });
-            if (window.location.pathname.endsWith('perfil.html')) {
+            // Se o usuário não está logado e tenta acessar perfil ou admin, redireciona para login
+            if (window.location.pathname.endsWith('perfil.html') || window.location.pathname.endsWith('admin.html')) {
                 window.location.href = 'login.html';
             }
         }
@@ -89,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (response.ok) {
                     currentUser = result.user;
                     showFeedbackMessage(result.message, 'success', 'loginFeedback');
-                    
+
                     setTimeout(() => {
                         if (currentUser && currentUser.role === 'admin') {
                             window.location.href = 'admin.html';
@@ -115,35 +157,35 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Erro ao fazer logout:', error);
         }
     }
-    
-    const signupForm = document.getElementById('signupForm'); 
-    if (signupForm) { 
-        signupForm.addEventListener('submit', async (e) => { 
-            e.preventDefault(); 
-            const name = document.getElementById('signup-name').value; 
-            const email = document.getElementById('signup-email').value; 
-            const password = document.getElementById('signup-senha').value; 
-            const confirmPassword = document.getElementById('signup-confirma-senha').value; 
-            if (password !== confirmPassword) { 
-                showFeedbackMessage('As senhas não coincidem!', 'error', 'signupFeedback'); return; 
-            } 
-            try { 
-                const response = await fetch('/api/register', { 
-                    method: 'POST', headers: { 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify({ name, email, password, confirmPassword }) 
-                }); 
-                const result = await response.json(); 
-                if (response.ok) { 
-                    showFeedbackMessage(result.message, 'success', 'signupFeedback'); 
-                    signupForm.reset(); 
-                    setTimeout(() => window.location.href = 'login.html', 2000); 
-                } else { 
-                    showFeedbackMessage(result.message, 'error', 'signupFeedback'); 
-                } 
-            } catch (err) { 
-                showFeedbackMessage('Erro de conexão. Tente novamente.', 'error', 'signupFeedback'); 
-            } 
-        }); 
+
+    const signupForm = document.getElementById('signupForm');
+    if (signupForm) {
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-senha').value;
+            const confirmPassword = document.getElementById('signup-confirma-senha').value;
+            if (password !== confirmPassword) {
+                showFeedbackMessage('As senhas não coincidem!', 'error', 'signupFeedback'); return;
+            }
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password, confirmPassword })
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    showFeedbackMessage(result.message, 'success', 'signupFeedback');
+                    signupForm.reset();
+                    setTimeout(() => window.location.href = 'login.html', 2000);
+                } else {
+                    showFeedbackMessage(result.message, 'error', 'signupFeedback');
+                }
+            } catch (err) {
+                showFeedbackMessage('Erro de conexão. Tente novamente.', 'error', 'signupFeedback');
+            }
+        });
     }
 
     function addToCart(productId) {
@@ -177,11 +219,11 @@ document.addEventListener('DOMContentLoaded', () => {
         let message = '';
         if (productIndex > -1) {
             favorites.splice(productIndex, 1);
-            if(buttonElement) buttonElement.classList.remove('active');
+            if (buttonElement) buttonElement.classList.remove('active');
             message = `"${product.nome_produto}" removido dos favoritos.`;
         } else {
             favorites.push(productId);
-            if(buttonElement) buttonElement.classList.add('active');
+            if (buttonElement) buttonElement.classList.add('active');
             message = `"${product.nome_produto}" adicionado aos favoritos!`;
         }
         saveFavorites();
@@ -191,8 +233,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Função para buscar TODOS os produtos (usada em páginas como index, carrinho, favoritos)
     async function fetchAllProducts() {
-        if (allProducts.length > 0) return allProducts;
+        // Se já carregamos todos os produtos e não estamos na página de busca, retorna os existentes
+        if (allProducts.length > 0 && !window.location.pathname.endsWith('busca.html')) {
+            return allProducts;
+        }
         try {
             const response = await fetch('/api/products');
             if (!response.ok) throw new Error('Falha ao carregar os livros do nosso acervo.');
@@ -206,17 +252,20 @@ document.addEventListener('DOMContentLoaded', () => {
             return [];
         }
     }
-    
+
     function renderProducts(productsToRender, container) {
         if (!container) return;
-        if (!productsToRender || productsToRender.length === 0) {
-            if (container.innerHTML === '' || container.innerHTML.includes('Carregando')) {
-               container.innerHTML = '<p class="text-center" style="grid-column: 1 / -1;">Nenhum livro encontrado.</p>';
-            }
+        // Se for a primeira renderização e não houver produtos, exibe mensagem
+        if (productsToRender.length === 0 && currentlyLoadedCount === 0) {
+            container.innerHTML = '<p class="text-center" style="grid-column: 1 / -1;">Nenhum livro encontrado.</p>';
+            return;
+        } else if (productsToRender.length === 0) {
+            // Se não há mais produtos para carregar, mas já carregou alguns
             return;
         }
+
         productsToRender.forEach(product => {
-            const priceText = typeof product.preco_produto === 'number' 
+            const priceText = typeof product.preco_produto === 'number'
                 ? `R$ ${product.preco_produto.toFixed(2).replace('.', ',')}`
                 : 'Preço a consultar';
             const isFavorite = Array.isArray(favorites) && favorites.includes(product.id);
@@ -242,7 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         addEventListenersToProductCards();
     }
-    
+
     if (menuToggle && mainNav) { menuToggle.addEventListener('click', () => { mainNav.classList.toggle('active'); menuToggle.querySelector('i').classList.toggle('fa-bars'); menuToggle.querySelector('i').classList.toggle('fa-times'); }); }
     function loadCart() { return JSON.parse(localStorage.getItem('almaDePapelCart')) || []; }
     function saveCart() { localStorage.setItem('almaDePapelCart', JSON.stringify(cart)); }
@@ -254,15 +303,23 @@ document.addEventListener('DOMContentLoaded', () => {
     function addEventListenersToProductCards() { document.querySelectorAll('.product-card').forEach(card => { const productId = parseInt(card.dataset.id, 10); card.querySelector('.add-to-cart-button')?.addEventListener('click', () => addToCart(productId)); card.querySelector('.favorite-button')?.addEventListener('click', (e) => toggleFavorite(productId, e.currentTarget)); }); }
     function showFeedbackMessage(message, type = 'success', containerId = 'feedbackMessageContainer') { const container = document.getElementById(containerId); if (!container) return; container.innerHTML = `<div class="feedback-message ${type}">${message}</div>`; setTimeout(() => { container.innerHTML = ''; }, 4000); }
     document.querySelectorAll('.password-toggle').forEach(button => { button.addEventListener('click', () => { const passwordInput = button.previousElementSibling; const icon = button.querySelector('i'); if (passwordInput.type === 'password') { passwordInput.type = 'text'; icon.classList.remove('fa-eye-slash'); icon.classList.add('fa-eye'); } else { passwordInput.type = 'password'; icon.classList.remove('fa-eye'); icon.classList.add('fa-eye-slash'); } }); });
+
     function setupLoadMoreButton() {
         const loadMoreBtn = document.getElementById('loadMoreBtn');
         if (!loadMoreBtn) return;
+
+        // Verifica se ainda há produtos para carregar
         if (allProducts.length > currentlyLoadedCount) {
             loadMoreBtn.classList.remove('hidden');
         } else {
             loadMoreBtn.classList.add('hidden');
         }
-        loadMoreBtn.addEventListener('click', () => {
+
+        // Remove listener anterior para evitar duplicações
+        loadMoreBtn.removeEventListener('click', loadMoreHandler);
+        loadMoreBtn.addEventListener('click', loadMoreHandler);
+
+        function loadMoreHandler() {
             const nextBatchStart = currentlyLoadedCount;
             const nextBatchEnd = currentlyLoadedCount + productsPerPage;
             const nextBatch = allProducts.slice(nextBatchStart, nextBatchEnd);
@@ -271,8 +328,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (currentlyLoadedCount >= allProducts.length) {
                 loadMoreBtn.classList.add('hidden');
             }
-        });
+        }
     }
+
     function renderFavoritesPage() {
         const container = document.getElementById('favoritesContainer');
         const emptyMessage = document.getElementById('emptyFavoritesMessage');
@@ -284,11 +342,11 @@ document.addEventListener('DOMContentLoaded', () => {
             container.classList.remove('hidden');
             emptyMessage.classList.add('hidden');
             const favoriteProducts = allProducts.filter(p => favorites.includes(p.id));
-            container.innerHTML = ''; 
+            container.innerHTML = '';
             renderProducts(favoriteProducts, container);
         }
     }
-    
+
     function renderCartPage() {
         const tableBody = document.getElementById('cartTableBody');
         const emptyMessage = document.getElementById('emptyCartMessage');
@@ -322,7 +380,41 @@ document.addEventListener('DOMContentLoaded', () => {
         tableBody.querySelectorAll('.quantity-change').forEach(btn => { btn.addEventListener('click', (e) => { const id = parseInt(e.currentTarget.dataset.id, 10); const change = parseInt(e.currentTarget.dataset.change, 10); const currentItem = cart.find(item => item.id === id); if (currentItem) { updateCartItemQuantity(id, currentItem.quantity + change); } }); });
     }
 
-    async function renderCategoryListPage() { const container = document.getElementById('categoryGridContainer'); if (!container) return; try { const response = await fetch('/api/categorias'); if (!response.ok) throw new Error('Não foi possível carregar as categorias.'); const categories = await response.json(); container.innerHTML = ''; categories.forEach(cat => { const categoryCard = `<a href="categoria.html?slug=${cat.slug}" class="category-card-detailed" id="${cat.slug}"><div class="category-card-detailed-image-carousel"><img src="${cat.imagem_url_1 || ''}" alt="Livros de ${cat.nome} - Imagem 1" class="carousel-image"><img src="${cat.imagem_url_2 || ''}" alt="Livros de ${cat.nome} - Imagem 2" class="carousel-image"><img src="${cat.imagem_url_3 || ''}" alt="Livros de ${cat.nome} - Imagem 3" class="carousel-image"></div><div class="category-card-detailed-content"><h3>${cat.nome}</h3><p>${cat.descricao}</p><span>Ver Livros <i class="fas fa-arrow-right"></i></span></div></a>`; container.insertAdjacentHTML('beforeend', categoryCard); }); const carousels = document.querySelectorAll('.category-card-detailed-image-carousel'); carousels.forEach(carousel => { const images = carousel.querySelectorAll('.carousel-image'); if (images.length > 1) { const firstValidImage = [...images].find(img => img.getAttribute('src')); if (firstValidImage) { firstValidImage.classList.add('active'); } setInterval(() => { const currentActive = carousel.querySelector('.carousel-image.active'); if (!currentActive) return; const currentActiveIndex = Array.from(images).indexOf(currentActive); let nextIndex = (currentActiveIndex + 1) % images.length; let loopGuard = images.length; while(!images[nextIndex].getAttribute('src') && loopGuard > 0) { nextIndex = (nextIndex + 1) % images.length; loopGuard--; } if (currentActive) currentActive.classList.remove('active'); if (images[nextIndex].getAttribute('src')) { images[nextIndex].classList.add('active'); } }, 3500); } else if (images.length === 1 && images[0].getAttribute('src')) { images[0].classList.add('active'); } }); } catch (error) { container.innerHTML = `<p class="text-center" style="grid-column: 1 / -1; color: red;">Não foi possível carregar as categorias.</p>`; } }
+    async function renderCategoryListPage() {
+        const container = document.getElementById('categoryGridContainer');
+        if (!container) return;
+        try {
+            const response = await fetch('/api/categorias');
+            if (!response.ok) throw new Error('Não foi possível carregar as categorias.');
+            const categories = await response.json();
+            container.innerHTML = '';
+            categories.forEach(cat => {
+                const categoryCard = `<a href="categoria.html?slug=${cat.slug}" class="category-card-detailed" id="${cat.slug}"><div class="category-card-detailed-image-carousel"><img src="${cat.imagem_url_1 || ''}" alt="Livros de ${cat.nome} - Imagem 1" class="carousel-image"><img src="${cat.imagem_url_2 || ''}" alt="Livros de ${cat.nome} - Imagem 2" class="carousel-image"><img src="${cat.imagem_url_3 || ''}" alt="Livros de ${cat.nome} - Imagem 3" class="carousel-image"></div><div class="category-card-detailed-content"><h3>${cat.nome}</h3><p>${cat.descricao}</p><span>Ver Livros <i class="fas fa-arrow-right"></i></span></div></a>`;
+                container.insertAdjacentHTML('beforeend', categoryCard);
+            });
+            const carousels = document.querySelectorAll('.category-card-detailed-image-carousel');
+            carousels.forEach(carousel => {
+                const images = carousel.querySelectorAll('.carousel-image');
+                if (images.length > 1) {
+                    const firstValidImage = [...images].find(img => img.getAttribute('src'));
+                    if (firstValidImage) { firstValidImage.classList.add('active'); }
+                    setInterval(() => {
+                        const currentActive = carousel.querySelector('.carousel-image.active');
+                        if (!currentActive) return;
+                        const currentActiveIndex = Array.from(images).indexOf(currentActive);
+                        let nextIndex = (currentActiveIndex + 1) % images.length;
+                        let loopGuard = images.length;
+                        while (!images[nextIndex].getAttribute('src') && loopGuard > 0) { nextIndex = (nextIndex + 1) % images.length; loopGuard--; }
+                        if (currentActive) currentActive.classList.remove('active');
+                        if (images[nextIndex].getAttribute('src')) { images[nextIndex].classList.add('active'); }
+                    }, 3500);
+                } else if (images.length === 1 && images[0].getAttribute('src')) { images[0].classList.add('active'); }
+            });
+        } catch (error) {
+            container.innerHTML = `<p class="text-center" style="grid-column: 1 / -1; color: red;">Não foi possível carregar as categorias.</p>`;
+        }
+    }
+
     async function renderSingleCategoryPage() {
         const params = new URLSearchParams(window.location.search);
         const slug = params.get('slug');
@@ -335,29 +427,91 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!catResponse.ok) throw new Error('Categoria não encontrada.');
             const category = await catResponse.json();
             document.title = `${category.nome} - Alma de Papel`;
-            if(titleEl) titleEl.textContent = category.nome;
-            if(descriptionEl) descriptionEl.textContent = category.descricao;
+            if (titleEl) titleEl.textContent = category.nome;
+            if (descriptionEl) descriptionEl.textContent = category.descricao;
             const prodResponse = await fetch(`/api/categorias/${slug}/produtos`);
             if (!prodResponse.ok) throw new Error('Não foi possível buscar os livros desta categoria.');
             let products = await prodResponse.json();
-            if (productsContainerEl) productsContainerEl.innerHTML = '';
-            renderProducts(products, productsContainerEl);
+
+            allProducts = products; // Atualiza allProducts com os resultados da categoria para paginação
+            currentlyLoadedCount = 0; // Reseta para a lógica de paginação
+
+            if (productsContainerEl) productsContainerEl.innerHTML = ''; // Limpa a mensagem "Buscando..."
+            const initialProducts = allProducts.slice(0, productsPerPage);
+            renderProducts(initialProducts, productsContainerEl);
+            currentlyLoadedCount = initialProducts.length;
+            setupLoadMoreButton(); // Reconfigura o botão de "Ver Mais" para a categoria
         } catch (error) {
-            if(titleEl) titleEl.textContent = 'Erro';
-            if(descriptionEl) descriptionEl.textContent = error.message;
-            if(productsContainerEl) productsContainerEl.innerHTML = '';
+            if (titleEl) titleEl.textContent = 'Erro';
+            if (descriptionEl) descriptionEl.textContent = error.message;
+            if (productsContainerEl) productsContainerEl.innerHTML = `<p class="text-center" style="grid-column: 1 / -1; color: red;">${error.message}</p>`;
         }
     }
 
+    // NOVA FUNÇÃO PARA RENDERIZAR A PÁGINA DE BUSCA
+    async function renderSearchPage() {
+        const params = new URLSearchParams(window.location.search);
+        const query = params.get('query');
+        const searchQueryDisplay = document.getElementById('searchQueryDisplay');
+        const searchResultDescription = document.getElementById('searchResultDescription');
+        const productsContainerEl = document.getElementById('productsContainer');
+        const loadMoreBtn = document.getElementById('loadMoreBtn');
+
+        if (searchInputPage && query) {
+            searchInputPage.value = decodeURIComponent(query); // Preenche o campo de busca
+        }
+
+        if (!query) {
+            if (searchQueryDisplay) searchQueryDisplay.textContent = 'nenhum termo';
+            if (searchResultDescription) searchResultDescription.textContent = 'Por favor, digite algo para buscar.';
+            if (productsContainerEl) productsContainerEl.innerHTML = '<p class="text-center" style="grid-column: 1 / -1;">Nenhum termo de busca fornecido.</p>';
+            if (loadMoreBtn) loadMoreBtn.classList.add('hidden');
+            return;
+        }
+
+        if (searchQueryDisplay) searchQueryDisplay.textContent = decodeURIComponent(query);
+        if (document.title) document.title = `Busca por "${decodeURIComponent(query)}" - Alma de Papel`;
+        if (productsContainerEl) productsContainerEl.innerHTML = '<p class="text-center" style="grid-column: 1 / -1;">Buscando livros...</p>';
+        if (loadMoreBtn) loadMoreBtn.classList.add('hidden'); // Esconde até que os resultados sejam carregados
+
+        try {
+            const response = await fetch(`/api/products/search?query=${encodeURIComponent(query)}`);
+            if (!response.ok) throw new Error('Falha ao buscar produtos.');
+            const searchResults = await response.json();
+
+            allProducts = searchResults; // 'allProducts' agora contém os resultados da busca para paginação
+            currentlyLoadedCount = 0; // Reseta o contador para a paginação dos resultados da busca
+
+            if (productsContainerEl) productsContainerEl.innerHTML = ''; // Limpa a mensagem "Buscando livros..."
+
+            if (allProducts.length === 0) {
+                if (searchResultDescription) searchResultDescription.textContent = `Não encontramos nenhum livro para "${decodeURIComponent(query)}". Tente outro termo!`;
+                if (productsContainerEl) productsContainerEl.innerHTML = '<p class="text-center" style="grid-column: 1 / -1;">Nenhum livro corresponde à sua busca.</p>';
+            } else {
+                if (searchResultDescription) searchResultDescription.textContent = `Encontramos ${allProducts.length} tesouro(s) para "${decodeURIComponent(query)}":`;
+                const initialProducts = allProducts.slice(0, productsPerPage);
+                renderProducts(initialProducts, productsContainerEl);
+                currentlyLoadedCount = initialProducts.length;
+                setupLoadMoreButton(); // Reconfigura o botão de "Ver Mais" para os resultados da busca
+            }
+        } catch (error) {
+            console.error('Erro na busca:', error.message);
+            if (searchResultDescription) searchResultDescription.textContent = `Erro ao buscar: ${error.message}`;
+            if (productsContainerEl) productsContainerEl.innerHTML = `<p class="text-center" style="grid-column: 1 / -1; color: red;">${error.message}</p>`;
+            if (loadMoreBtn) loadMoreBtn.classList.add('hidden');
+        }
+    }
+
+
     async function initializePage() {
         await checkUserSession();
-        await fetchAllProducts();
-        
+
         const currentPage = window.location.pathname.split("/").pop() || "index.html";
 
         if (currentPage === 'index.html' || currentPage === '') {
-            if(productsContainer) {
-                productsContainer.innerHTML = ''; 
+            if (productsContainer) {
+                productsContainer.innerHTML = '';
+                await fetchAllProducts(); // Garante que allProducts seja populado para a página inicial
                 const initialProducts = allProducts.slice(0, productsPerPage);
                 renderProducts(initialProducts, productsContainer);
                 currentlyLoadedCount = initialProducts.length;
@@ -366,12 +520,25 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (currentPage === 'categorias.html') {
             renderCategoryListPage();
         } else if (currentPage === 'categoria.html') {
+            await fetchAllProducts(); // Necessário para carrinho/favoritos na página de categoria
             renderSingleCategoryPage();
         } else if (currentPage === 'favoritos.html') {
+            await fetchAllProducts(); // Necessário para renderizar produtos favoritos
             renderFavoritesPage();
         } else if (currentPage === 'carrinho.html') {
+            await fetchAllProducts(); // Necessário para renderizar itens do carrinho
             renderCartPage();
+        } else if (currentPage === 'busca.html') { // Nova condição para a página de busca
+            renderSearchPage();
+        } else if (currentPage === 'perfil.html') {
+            // O updateUIForUser já cuida do redirecionamento ou preenchimento
+            // mas podemos garantir que allProducts esteja disponível se necessário para outras features futuras
+            await fetchAllProducts();
         }
+        // Para outras páginas como 'sobre.html', 'contato.html', 'cadastro.html', 'login.html'
+        // fetchAllProducts pode não ser estritamente necessário no carregamento inicial,
+        // mas é bom ter o array populado caso o usuário interaja com o carrinho/favoritos.
+        // Já está sendo chamado em checkUserSession indiretamente se updateUIForUser não redirecionar.
     }
 
     initializePage();
