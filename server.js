@@ -5,6 +5,7 @@ const supabase = require('./database.js');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
+const nodemailer = require('nodemailer');
 
 const app = express();
 const port = 3000;
@@ -122,10 +123,52 @@ app.post("/api/logout", (req, res) => {
     res.status(200).json({ message: 'Logout bem-sucedido.' });
 });
 
+// --- ROTA PARA O FORMULÁRIO DE CONTATO ---
+app.post("/api/contact", async (req, res) => {
+    const { name, email, subject, message } = req.body;
+
+    if (!name || !email || !subject || !message) {
+        return res.status(400).json({ message: 'Por favor, preencha todos os campos do formulário.' });
+    }
+
+    try {
+        const transporter = nodemailer.createTransport({
+            service: 'gmail', // Para Gmail
+            auth: {
+                user: process.env.EMAIL_USER, // Seu e-mail (contosalmadepapel@gmail.com)
+                pass: process.env.EMAIL_PASS  // Sua "App Password" do Gmail
+            }
+        });
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER, // O remetente do e-mail
+            to: 'contosalmadepapel@gmail.com', // O destinatário do e-mail (para onde você quer receber)
+            subject: `Contato Alma de Papel: ${subject}`,
+            html: `
+                <p><strong>Nome:</strong> ${name}</p>
+                <p><strong>Email:</strong> ${email}</p>
+                <p><strong>Assunto:</strong> ${subject}</p>
+                <p><strong>Mensagem:</strong></p>
+                <p>${message.replace(/\n/g, '<br>')}</p>
+                <hr>
+                <small>Este e-mail foi enviado através do formulário de contato do site Alma de Papel.</small>
+            `
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log(`Email de contato enviado por ${email} com assunto: ${subject}`);
+        res.status(200).json({ message: 'Sua mensagem foi enviada com sucesso! Em breve entraremos em contato.' });
+
+    } catch (error) {
+        console.error('Erro ao enviar e-mail de contato:', error);
+        res.status(500).json({ message: 'Erro ao enviar sua mensagem. Tente novamente mais tarde.' });
+    }
+});
+
 
 // --- Rotas de Admin ---
 app.post("/api/admin/products", authenticateToken, isAdmin, async (req, res) => {
-    const { nome_produto, Autor_produto, imagem_url, categoria_id, preco_produto } = req.body;
+    const { nome_produto, Autor_produto, imagem_url, categoria_id, preco_produto, sinopse} = req.body;
 
     // Basic validation
     if (!nome_produto || !Autor_produto || !imagem_url || !categoria_id || preco_produto === undefined) {
@@ -135,7 +178,7 @@ app.post("/api/admin/products", authenticateToken, isAdmin, async (req, res) => 
     try {
         const { data, error } = await supabase
             .from('produto')
-            .insert([{ nome_produto, Autor_produto, imagem_url, categoria_id, preco_produto }])
+            .insert([{ nome_produto, Autor_produto, imagem_url, categoria_id, preco_produto, sinopse }])
             .select();
 
         if (error) {
@@ -151,7 +194,7 @@ app.post("/api/admin/products", authenticateToken, isAdmin, async (req, res) => 
 
 app.put("/api/admin/products/:id", authenticateToken, isAdmin, async (req, res) => {
     const { id } = req.params;
-    const { nome_produto, Autor_produto, imagem_url, categoria_id, preco_produto } = req.body;
+    const { nome_produto, Autor_produto, imagem_url, categoria_id, preco_produto, sinopse } = req.body;
 
     // Basic validation
     if (!nome_produto || !Autor_produto || !imagem_url || !categoria_id || preco_produto === undefined) {
@@ -161,7 +204,7 @@ app.put("/api/admin/products/:id", authenticateToken, isAdmin, async (req, res) 
     try {
         const { data, error } = await supabase
             .from('produto')
-            .update({ nome_produto, Autor_produto, imagem_url, categoria_id, preco_produto })
+            .update({ nome_produto, Autor_produto, imagem_url, categoria_id, preco_produto, sinopse })
             .eq('id', id)
             .select();
 
@@ -213,6 +256,29 @@ app.get("/api/products", async (req, res) => {
         res.status(500).json({ error: 'Erro ao buscar produtos do banco de dados.' });
     }
 });
+
+// NOVO ENDPOINT: Busca um único produto por ID
+app.get("/api/products/:id", async (req, res) => {
+    const { id } = req.params;
+    try {
+        const { data, error } = await supabase
+            .from('produto')
+            .select('*') // <-- 'select(*)' DEVE incluir a sinopse se a coluna existe no DB
+            .eq('id', id)
+            .single(); // Use .single() para esperar um único resultado
+
+        // PGRST116 significa que nenhuma linha foi encontrada
+        if (error && error.code !== 'PGRST116') throw error; 
+        if (!data) {
+            return res.status(404).json({ message: 'Livro não encontrado.' });
+        }
+        res.json(data);
+    } catch (error) {
+        console.error(`Erro ao buscar produto ${id}:`, error.message);
+        res.status(500).json({ error: 'Erro ao buscar o livro do banco de dados.' });
+    }
+});
+
 
 // NOVO ENDPOINT DE BUSCA
 app.get("/api/products/search", async (req, res) => {
@@ -290,6 +356,11 @@ app.get('/', (req, res) => {
 // Adicione esta rota para a nova página de busca
 app.get('/busca.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'busca.html'));
+});
+
+// NOVA ROTA: Adicione esta rota para a nova página de detalhes do livro
+app.get('/livro.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'livro.html'));
 });
 
 

@@ -1,4 +1,5 @@
 let currentUser = null;
+let allCategories = []; // Global variable to store all categories for easy lookup
 
 document.addEventListener('DOMContentLoaded', () => {
     let allProducts = []; // Pode conter todos os produtos ou resultados de busca, dependendo da página
@@ -188,14 +189,63 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- CÓDIGO PARA O FORMULÁRIO DE CONTATO ---
+    const contactForm = document.getElementById('contactForm');
+    if (contactForm) {
+        contactForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById('contact-name').value;
+            const email = document.getElementById('contact-email').value;
+            const subject = document.getElementById('contact-subject').value;
+            const message = document.getElementById('contact-message').value;
+
+            try {
+                const response = await fetch('/api/contact', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, subject, message })
+                });
+                const result = await response.json();
+
+                if (response.ok) {
+                    showFeedbackMessage(result.message, 'success', 'contactFormFeedback');
+                    contactForm.reset(); // Limpa o formulário após o envio
+                } else {
+                    showFeedbackMessage(result.message, 'error', 'contactFormFeedback');
+                }
+            } catch (err) {
+                console.error('Erro na submissão do formulário de contato:', err);
+                showFeedbackMessage('Erro de conexão. Não foi possível enviar sua mensagem.', 'error', 'contactFormFeedback');
+            }
+        });
+    }
+    // --- FIM DO CÓDIGO DO FORMULÁRIO DE CONTATO ---
+
     function addToCart(productId) {
         if (!currentUser) {
             alert('Você precisa estar logado para adicionar itens ao carrinho!');
             window.location.href = 'login.html';
             return;
         }
-        const product = allProducts.find(p => p.id === productId);
-        if (!product) return;
+        // allProducts pode não conter o produto se a página atual for "livro.html"
+        // e `allProducts` ainda não foi populado com todos os produtos.
+        // Precisamos garantir que o produto esteja disponível.
+        let product = allProducts.find(p => p.id === productId);
+        if (!product && window.location.pathname.endsWith('livro.html')) {
+            // Se estiver na página de detalhes, o 'singleProduct' pode ser a fonte
+            const productDetailContent = document.getElementById('productDetailContent');
+            if (productDetailContent && productDetailContent.dataset.product) {
+                product = JSON.parse(productDetailContent.dataset.product);
+            }
+        }
+
+        if (!product) {
+            console.error('Produto não encontrado para adicionar ao carrinho:', productId);
+            showFeedbackMessage('Produto não encontrado para adicionar ao carrinho.', 'error');
+            return;
+        }
+
         const cartItem = cart.find(item => item.id === productId);
         if (cartItem) {
             cartItem.quantity++;
@@ -213,8 +263,20 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = 'login.html';
             return;
         }
-        const product = allProducts.find(p => p.id === productId);
-        if (!product) return;
+        let product = allProducts.find(p => p.id === productId);
+        if (!product && window.location.pathname.endsWith('livro.html')) {
+            const productDetailContent = document.getElementById('productDetailContent');
+            if (productDetailContent && productDetailContent.dataset.product) {
+                product = JSON.parse(productDetailContent.dataset.product);
+            }
+        }
+
+        if (!product) {
+            console.error('Produto não encontrado para favoritar:', productId);
+            showFeedbackMessage('Produto não encontrado para favoritar.', 'error');
+            return;
+        }
+
         const productIndex = favorites.indexOf(productId);
         let message = '';
         if (productIndex > -1) {
@@ -231,12 +293,24 @@ document.addEventListener('DOMContentLoaded', () => {
         if (document.getElementById('favoritesContainer')) {
             renderFavoritesPage();
         }
+        // Para a página de detalhes do livro, atualiza o texto do botão
+        if (window.location.pathname.endsWith('livro.html')) {
+            const favoriteButton = document.getElementById('favoriteDetailButton');
+            if (favoriteButton) {
+                favoriteButton.innerHTML = `<i class="fas fa-heart"></i> ${favorites.includes(productId) ? 'Remover dos Favoritos' : 'Favoritar'}`;
+                if (favorites.includes(productId)) {
+                    favoriteButton.classList.add('active');
+                } else {
+                    favoriteButton.classList.remove('active');
+                }
+            }
+        }
     }
 
     // Função para buscar TODOS os produtos (usada em páginas como index, carrinho, favoritos)
     async function fetchAllProducts() {
-        // Se já carregamos todos os produtos e não estamos na página de busca, retorna os existentes
-        if (allProducts.length > 0 && !window.location.pathname.endsWith('busca.html')) {
+        // Se já carregamos todos os produtos e não estamos na página de busca ou livro.html, retorna os existentes
+        if (allProducts.length > 0 && !window.location.pathname.endsWith('busca.html') && !window.location.pathname.endsWith('livro.html')) {
             return allProducts;
         }
         try {
@@ -249,6 +323,20 @@ document.addEventListener('DOMContentLoaded', () => {
             if (productsContainer) {
                 productsContainer.innerHTML = `<p class="text-center" style="grid-column: 1 / -1; color: red;">${error.message}</p>`;
             }
+            return [];
+        }
+    }
+
+    // NOVA FUNÇÃO: Buscar todas as categorias de uma vez
+    async function fetchAllCategories() {
+        if (allCategories.length > 0) return allCategories; // Já buscado
+        try {
+            const response = await fetch('/api/categorias');
+            if (!response.ok) throw new Error('Falha ao carregar as categorias.');
+            allCategories = await response.json();
+            return allCategories;
+        } catch (error) {
+            console.error('Erro ao carregar categorias:', error.message);
             return [];
         }
     }
@@ -271,10 +359,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const isFavorite = Array.isArray(favorites) && favorites.includes(product.id);
             const productCard = `
                 <article class="product-card" data-id="${product.id}">
-                    <a href="#" class="product-image-link">
+                    <a href="livro.html?id=${product.id}" class="product-image-link"> <!-- MODIFICADO: Link para a página do livro -->
                         <img src="${product.imagem_url}" alt="Capa do Livro ${product.nome_produto}">
                     </a>
-                    <h3>${product.nome_produto}</h3>
+                    <h3><a href="livro.html?id=${product.id}">${product.nome_produto}</a></h3> <!-- MODIFICADO: Link para a página do livro -->
                     <p class="author">${product.Autor_produto || 'Autor desconhecido'}</p>
                     <p class="price">${priceText}</p>
                     <div class="product-card-actions">
@@ -448,7 +536,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // NOVA FUNÇÃO PARA RENDERIZAR A PÁGINA DE BUSCA
+    // FUNÇÃO PARA RENDERIZAR A PÁGINA DE BUSCA
     async function renderSearchPage() {
         const params = new URLSearchParams(window.location.search);
         const query = params.get('query');
@@ -502,9 +590,96 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // NOVA FUNÇÃO: Renderizar página de detalhes de um único produto
+    async function renderSingleProductPage() {
+        const params = new URLSearchParams(window.location.search);
+        const productId = params.get('id');
+
+        const loader = document.getElementById('productDetailLoader');
+        const content = document.getElementById('productDetailContent');
+        const pageTitle = document.getElementById('pageTitle');
+        const productDetailImage = document.getElementById('productDetailImage');
+        const productDetailName = document.getElementById('productDetailName');
+        const productDetailAuthor = document.getElementById('productDetailAuthor');
+        const productDetailCategory = document.getElementById('productDetailCategory');
+        const productDetailPrice = document.getElementById('productDetailPrice');
+        const productDetailSynopsis = document.getElementById('productDetailSynopsis');
+        const addToCartDetailButton = document.getElementById('addToCartDetailButton');
+        const favoriteDetailButton = document.getElementById('favoriteDetailButton');
+
+        if (!productId) {
+            if (loader) loader.classList.add('hidden');
+            if (content) content.innerHTML = '<p class="text-center">ID do livro não fornecido.</p>';
+            return;
+        }
+
+        try {
+            if (loader) loader.classList.remove('hidden');
+            if (content) content.classList.add('hidden');
+
+            const [productResponse, categoriesResponse] = await Promise.all([
+                fetch(`/api/products/${productId}`),
+                fetchAllCategories() // Garante que as categorias estejam carregadas
+            ]);
+
+            if (!productResponse.ok) {
+                const errorData = await productResponse.json();
+                throw new Error(errorData.message || 'Livro não encontrado.');
+            }
+            const product = await productResponse.json();
+
+            // Store the single product in allProducts for addToCart/toggleFavorite to find it
+            // Or explicitly pass the product object to them. For simplicity, we'll ensure it's in allProducts.
+            // Resetting allProducts to just this one ensures handlers find the correct product
+            allProducts = [product]; 
+
+            if (pageTitle) pageTitle.textContent = `${product.nome_produto} - Alma de Papel`;
+            if (productDetailImage) productDetailImage.src = product.imagem_url;
+            if (productDetailImage) productDetailImage.alt = `Capa do Livro ${product.nome_produto}`;
+            if (productDetailName) productDetailName.textContent = product.nome_produto;
+            if (productDetailAuthor) productDetailAuthor.textContent = product.Autor_produto || 'Autor desconhecido';
+            
+            // Encontra o nome da categoria usando a lista global allCategories
+            const category = allCategories.find(cat => cat.id === product.categoria_id);
+            if (productDetailCategory) productDetailCategory.textContent = `Categoria: ${category ? category.nome : 'Desconhecida'}`;
+
+            const priceText = typeof product.preco_produto === 'number'
+                ? `R$ ${product.preco_produto.toFixed(2).replace('.', ',')}`
+                : 'Preço a consultar';
+            if (productDetailPrice) productDetailPrice.textContent = priceText;
+            // Assumindo que a tabela 'produto' tem uma coluna 'sinopse'
+            if (productDetailSynopsis) productDetailSynopsis.textContent = product.sinopse || 'Sinopse não disponível.';
+
+            // Define um atributo de dados no conteúdo para facilitar o acesso aos handlers dos botões
+            if (content) content.dataset.product = JSON.stringify(product);
+
+            // Adiciona event listeners para os botões na página de detalhes
+            if (addToCartDetailButton) {
+                addToCartDetailButton.onclick = () => addToCart(product.id);
+            }
+            if (favoriteDetailButton) {
+                const isFavorite = Array.isArray(favorites) && favorites.includes(product.id);
+                favoriteDetailButton.classList.toggle('active', isFavorite);
+                favoriteDetailButton.innerHTML = `<i class="fas fa-heart"></i> ${isFavorite ? 'Remover dos Favoritos' : 'Favoritar'}`;
+                favoriteDetailButton.onclick = (e) => toggleFavorite(product.id, e.currentTarget);
+            }
+            
+            if (loader) loader.classList.add('hidden');
+            if (content) content.classList.remove('hidden');
+
+        } catch (error) {
+            console.error('Erro ao carregar detalhes do livro:', error);
+            if (loader) loader.classList.add('hidden');
+            if (content) content.classList.remove('hidden');
+            if (content) content.innerHTML = `<p class="text-center" style="color: red;">${error.message}</p>`;
+            if (pageTitle) pageTitle.textContent = 'Erro - Alma de Papel';
+        }
+    }
+
 
     async function initializePage() {
         await checkUserSession();
+        await fetchAllCategories(); // Carrega todas as categorias no início de todas as páginas
 
         const currentPage = window.location.pathname.split("/").pop() || "index.html";
 
@@ -520,7 +695,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (currentPage === 'categorias.html') {
             renderCategoryListPage();
         } else if (currentPage === 'categoria.html') {
-            await fetchAllProducts(); // Necessário para carrinho/favoritos na página de categoria
+            // fetchAllProducts é chamado indiretamente em renderSingleCategoryPage se necessário.
             renderSingleCategoryPage();
         } else if (currentPage === 'favoritos.html') {
             await fetchAllProducts(); // Necessário para renderizar produtos favoritos
@@ -530,7 +705,10 @@ document.addEventListener('DOMContentLoaded', () => {
             renderCartPage();
         } else if (currentPage === 'busca.html') { // Nova condição para a página de busca
             renderSearchPage();
-        } else if (currentPage === 'perfil.html') {
+        } else if (currentPage === 'livro.html') { // NOVA CONDIÇÃO para a página de detalhes do livro
+            renderSingleProductPage();
+        }
+        else if (currentPage === 'perfil.html') {
             // O updateUIForUser já cuida do redirecionamento ou preenchimento
             // mas podemos garantir que allProducts esteja disponível se necessário para outras features futuras
             await fetchAllProducts();

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">Detalhes do Livro - Alma de Papel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <a href="index.html" class="logo">
+                <img src="imagens/-1100493983.png" alt="Alma de Papel Logo">
+                <h1>Alma de Papel</h1>
+            </a>
+            <div class="header-actions-container">
+                <form class="search-bar" id="searchBarPage">
+                    <input type="text" id="searchInputPage" placeholder="Buscar...">
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                </form>
+                <div class="header-actions">
+                    <a href="favoritos.html" class="action-link" aria-label="Favoritos"><i class="fas fa-heart"></i></a>
+                    <a href="carrinho.html" class="action-link" aria-label="Carrinho"><i class="fas fa-shopping-cart"></i><span class="cart-count-indicator" id="cart-item-count">0</span></a>
+                    <a href="login.html" id="user-account-link" class="action-link" aria-label="Minha Conta"><i class="fas fa-user-circle"></i></a>
+                </div>
+                <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu" aria-expanded="false"><i class="fas fa-bars"></i></button>
+            </div>
+            <nav class="main-nav" id="mainNav">
+                 <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="categorias.html">Categorias</a></li>
+                    <li><a href="sobre.html">Sobre</a></li>
+                    <li><a href="contato.html">Contato</a></li>
+                 </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="container page-section product-detail-page">
+            <div id="feedbackMessageContainer" class="feedback-message-container"></div>
+
+            <div class="product-detail-loader" id="productDetailLoader">
+                <p class="text-center">Carregando detalhes do livro...</p>
+            </div>
+
+            <div class="product-detail-content hidden" id="productDetailContent">
+                <div class="product-image-area">
+                    <img id="productDetailImage" src="" alt="Capa do Livro">
+                </div>
+                <div class="product-info-area">
+                    <h1 id="productDetailName">Nome do Livro</h1>
+                    <p class="product-detail-author" id="productDetailAuthor">Autor do Livro</p>
+                    <p class="product-detail-category" id="productDetailCategory">Categoria: Carregando...</p>
+                    <p class="product-detail-price" id="productDetailPrice">R$ 00,00</p>
+                    
+                    <div class="product-detail-actions">
+                        <button class="btn btn-primary" id="addToCartDetailButton">
+                            <i class="fas fa-cart-plus"></i> Adicionar ao Carrinho
+                        </button>
+                        <button class="btn favorite-button" id="favoriteDetailButton" aria-label="Adicionar aos Favoritos">
+                            <i class="fas fa-heart"></i> Favoritar
+                        </button>
+                    </div>
+
+                    <div class="product-synopsis">
+                        <h3>Sinopse</h3>
+                        <p id="productDetailSynopsis">Carregando sinopse...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-brand">
+                <a href="index.html" class="logo">
+                    <img src="imagens/-1100493983.png" alt="Alma de Papel Logo Rodapé">
+                    <h1>Alma de Papel</h1>
+                </a>
+            </div>
+            <nav class="footer-nav">
+                <h4>Descubra</h4>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="categorias.html">Categorias</a></li>
+                    <li><a href="favoritos.html">Favoritos</a></li>
+                    <li><a href="sobre.html">Nossa História</a></li>
+                    <li><a href="contato.html">Fale Conosco</a></li>
+                    <li><a href="login.html">Minha Conta</a></li>
+                </ul>
+            </nav>
+            <div class="contact-info-footer">
+                <h4>Contato Mágico</h4>
+                <p><i class="fas fa-envelope"></i> contosalmadepapel@gmail.com</p>
+                <p><i class="fas fa-phone-alt"></i> (44) 98839-4402</p>
+                <p><i class="fas fa-map-marker-alt"></i> Ateliê Online, Brasil</p>
+            </div>
+        </div>
+        <div class="copyright">
+             © <span id="currentYear"></span> Alma de Papel. Feito com amor e um toque de magia.
+        </div>
+    </footer>
+    <script src="js/main.js"></script>
+</body>
+</html>

@@ -6,6 +6,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const cancelEditBtn = document.getElementById('cancelEditBtn');
     const productIdField = document.getElementById('productId');
     
+    // Referências aos campos do formulário
+    const productNameInput = document.getElementById('productName');
+    const productAuthorInput = document.getElementById('productAuthor');
+    const productImageInput = document.getElementById('productImage');
+    const productPriceInput = document.getElementById('productPrice');
+    const productSynopsisInput = document.getElementById('productSynopsis'); // NOVO: Referência ao campo de sinopse
+
     let allCategories = [];
 
     async function checkAdminAccess() {
@@ -89,14 +96,15 @@ document.addEventListener('DOMContentLoaded', () => {
     productForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        const priceString = document.getElementById('productPrice').value.replace(',', '.');
+        const priceString = productPriceInput.value.replace(',', '.');
 
         const productData = {
-            nome_produto: document.getElementById('productName').value,
-            Autor_produto: document.getElementById('productAuthor').value,
-            imagem_url: document.getElementById('productImage').value,
-            categoria_id: parseInt(document.getElementById('productCategory').value, 10),
-            preco_produto: parseFloat(priceString)
+            nome_produto: productNameInput.value,
+            Autor_produto: productAuthorInput.value,
+            imagem_url: productImageInput.value,
+            categoria_id: parseInt(categorySelect.value, 10),
+            preco_produto: parseFloat(priceString),
+            sinopse: productSynopsisInput.value // NOVO: Inclui a sinopse no objeto de dados
         };
         
         const id = productIdField.value;
@@ -142,18 +150,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (target.classList.contains('edit-btn')) {
-            const response = await fetch('/api/products');
-            const products = await response.json();
-            const product = products.find(p => p.id == id);
+            // Busca o produto específico para garantir que temos todos os dados, incluindo a sinopse
+            const response = await fetch(`/api/products/${id}`); 
+            if (!response.ok) {
+                showAdminFeedback('Não foi possível carregar os dados do produto para edição.', 'error');
+                return;
+            }
+            const product = await response.json();
             
             if (product) {
                 productFormTitle.textContent = 'Editando Livro';
                 productIdField.value = product.id;
-                document.getElementById('productName').value = product.nome_produto;
-                document.getElementById('productAuthor').value = product.Autor_produto;
-                document.getElementById('productImage').value = product.imagem_url;
-                document.getElementById('productCategory').value = product.categoria_id;
-                document.getElementById('productPrice').value = product.preco_produto;
+                productNameInput.value = product.nome_produto;
+                productAuthorInput.value = product.Autor_produto;
+                productImageInput.value = product.imagem_url;
+                categorySelect.value = product.categoria_id;
+                productPriceInput.value = product.preco_produto;
+                productSynopsisInput.value = product.sinopse || ''; // NOVO: Preenche o campo de sinopse ao editar
                 cancelEditBtn.classList.remove('hidden');
                 window.scrollTo(0, 0);
             }

@@ -2167,3 +2167,156 @@ footer {
 .actions-cell .btn-icon.delete-btn:hover {
     color: #d9534f;
 }
+.product-detail-page {
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
+.product-detail-loader {
+    text-align: center;
+    padding: 50px 0;
+    font-size: 1.2em;
+    color: #555;
+}
+
+.product-detail-content {
+    display: flex;
+    flex-wrap: wrap; /* Permite quebrar em linhas em telas menores */
+    gap: 40px; /* Espaço entre imagem e informações */
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.product-image-area {
+    flex: 1; /* Ocupa o espaço disponível */
+    min-width: 300px; /* Largura mínima para a área da imagem */
+    max-width: 400px; /* Largura máxima para a imagem */
+    text-align: center;
+}
+
+.product-image-area img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.product-info-area {
+    flex: 2; /* Ocupa mais espaço que a imagem */
+    min-width: 350px; /* Largura mínima para a área de informações */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Alinha o conteúdo ao topo */
+}
+
+.product-detail-content h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5em;
+    color: var(--color-heading);
+    margin-bottom: 10px;
+    line-height: 1.2;
+}
+
+.product-detail-author,
+.product-detail-category {
+    font-family: 'Lato', sans-serif;
+    color: var(--color-text-light);
+    font-size: 1.1em;
+    margin-bottom: 8px;
+}
+
+.product-detail-price {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8em;
+    color: var(--color-primary);
+    font-weight: 700;
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+
+.product-detail-actions {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+    flex-wrap: wrap; /* Permite quebrar em linhas */
+}
+
+.product-detail-actions .btn {
+    padding: 12px 25px;
+    font-size: 1em;
+}
+
+.product-detail-actions .favorite-button {
+    background-color: var(--color-gray-light);
+    color: var(--color-text-dark);
+}
+
+.product-detail-actions .favorite-button.active {
+    background-color: var(--color-secondary);
+    color: #fff;
+}
+
+.product-detail-actions .favorite-button.active i {
+    color: #fff; /* Garante que o ícone do coração seja branco quando ativo */
+}
+
+.product-detail-actions .favorite-button i {
+    margin-right: 8px;
+    color: var(--color-text-dark); /* Cor padrão do coração */
+}
+
+.product-synopsis h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5em;
+    color: var(--color-heading);
+    margin-top: 30px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 10px;
+}
+
+.product-synopsis p {
+    font-family: 'Lato', sans-serif;
+    font-size: 1em;
+    line-height: 1.7;
+    color: var(--color-text-dark);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .product-detail-content {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 20px;
+    }
+
+    .product-image-area {
+        min-width: unset;
+        max-width: 80%; /* Ajuste conforme necessário */
+    }
+
+    .product-info-area {
+        min-width: unset;
+        text-align: center;
+        align-items: center;
+    }
+
+    .product-detail-content h1 {
+        font-size: 2em;
+    }
+
+    .product-detail-price {
+        font-size: 1.5em;
+    }
+
+    .product-detail-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .product-detail-actions .btn {
+        width: 100%;
+    }}
