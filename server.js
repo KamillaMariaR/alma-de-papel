@@ -168,9 +168,8 @@ app.post("/api/contact", async (req, res) => {
 
 // --- Rotas de Admin ---
 app.post("/api/admin/products", authenticateToken, isAdmin, async (req, res) => {
-    const { nome_produto, Autor_produto, imagem_url, categoria_id, preco_produto, sinopse} = req.body;
+    const { nome_produto, Autor_produto, imagem_url, categoria_id, preco_produto, sinopse } = req.body;
 
-    // Basic validation
     if (!nome_produto || !Autor_produto || !imagem_url || !categoria_id || preco_produto === undefined) {
         return res.status(400).json({ message: 'Todos os campos do produto são obrigatórios.' });
     }
@@ -182,7 +181,7 @@ app.post("/api/admin/products", authenticateToken, isAdmin, async (req, res) => 
             .select();
 
         if (error) {
-            console.error('Erro Supabase ao adicionar produto:', error); // Log detailed Supabase error
+            console.error('Erro Supabase ao adicionar produto:', error);
             throw new Error(`Erro no banco de dados: ${error.message}`);
         }
         res.status(201).json({ message: 'Livro adicionado com sucesso!', data: data[0] });
@@ -196,7 +195,6 @@ app.put("/api/admin/products/:id", authenticateToken, isAdmin, async (req, res) 
     const { id } = req.params;
     const { nome_produto, Autor_produto, imagem_url, categoria_id, preco_produto, sinopse } = req.body;
 
-    // Basic validation
     if (!nome_produto || !Autor_produto || !imagem_url || !categoria_id || preco_produto === undefined) {
         return res.status(400).json({ message: 'Todos os campos do produto são obrigatórios.' });
     }
@@ -209,7 +207,7 @@ app.put("/api/admin/products/:id", authenticateToken, isAdmin, async (req, res) 
             .select();
 
         if (error) {
-            console.error('Erro Supabase ao atualizar produto:', error); // Log detailed Supabase error
+            console.error('Erro Supabase ao atualizar produto:', error);
             throw new Error(`Erro no banco de dados: ${error.message}`);
         }
         if (!data || data.length === 0) {
@@ -232,11 +230,9 @@ app.delete("/api/admin/products/:id", authenticateToken, isAdmin, async (req, re
             .eq('id', id);
 
         if (error) {
-            console.error('Erro Supabase ao deletar produto:', error); // Log detailed Supabase error
+            console.error('Erro Supabase ao deletar produto:', error);
             throw new Error(`Erro no banco de dados: ${error.message}`);
         }
-        // Check if any row was actually deleted (Supabase doesn't return data on delete by default)
-        // You might need to check the error object or perform a select before delete if strict check is needed.
         res.status(200).json({ message: 'Livro excluído com sucesso!' });
     } catch (error) {
         console.error(`Erro ao deletar produto ${id}:`, error.message);
@@ -245,42 +241,9 @@ app.delete("/api/admin/products/:id", authenticateToken, isAdmin, async (req, re
 });
 
 
-// --- Rotas Públicas ---
-app.get("/api/products", async (req, res) => {
-    try {
-        const { data, error } = await supabase.from('produto').select('*');
-        if (error) throw error;
-        res.json(data);
-    } catch (error) {
-        console.error('Erro ao buscar produtos:', error.message);
-        res.status(500).json({ error: 'Erro ao buscar produtos do banco de dados.' });
-    }
-});
+// --- Rotas Públicas (ORDEM ALTERADA AQUI) ---
 
-// NOVO ENDPOINT: Busca um único produto por ID
-app.get("/api/products/:id", async (req, res) => {
-    const { id } = req.params;
-    try {
-        const { data, error } = await supabase
-            .from('produto')
-            .select('*') // <-- 'select(*)' DEVE incluir a sinopse se a coluna existe no DB
-            .eq('id', id)
-            .single(); // Use .single() para esperar um único resultado
-
-        // PGRST116 significa que nenhuma linha foi encontrada
-        if (error && error.code !== 'PGRST116') throw error; 
-        if (!data) {
-            return res.status(404).json({ message: 'Livro não encontrado.' });
-        }
-        res.json(data);
-    } catch (error) {
-        console.error(`Erro ao buscar produto ${id}:`, error.message);
-        res.status(500).json({ error: 'Erro ao buscar o livro do banco de dados.' });
-    }
-});
-
-
-// NOVO ENDPOINT DE BUSCA
+// Mova esta rota (mais específica) para antes das rotas mais gerais
 app.get("/api/products/search", async (req, res) => {
     const { query } = req.query; // Pega o termo de busca da query string (ex: ?query=harry)
     if (!query) {
@@ -297,7 +260,39 @@ app.get("/api/products/search", async (req, res) => {
         if (error) throw error;
         res.json(data);
     } catch (error) {
-        console.error('Erro ao buscar produtos:', error.message);
+        console.error('Erro ao buscar produtos (search):', error.message); // Modificado o log para diferenciar
+        res.status(500).json({ error: 'Erro ao buscar produtos do banco de dados.' });
+    }
+});
+
+
+app.get("/api/products/:id", async (req, res) => {
+    const { id } = req.params;
+    try {
+        const { data, error } = await supabase
+            .from('produto')
+            .select('*')
+            .eq('id', id)
+            .single();
+
+        if (error && error.code !== 'PGRST116') throw error; 
+        if (!data) {
+            return res.status(404).json({ message: 'Livro não encontrado.' });
+        }
+        res.json(data);
+    } catch (error) {
+        console.error(`Erro ao buscar produto ${id}:`, error.message);
+        res.status(500).json({ error: 'Erro ao buscar o livro do banco de dados.' });
+    }
+});
+
+app.get("/api/products", async (req, res) => {
+    try {
+        const { data, error } = await supabase.from('produto').select('*');
+        if (error) throw error;
+        res.json(data);
+    } catch (error) {
+        console.error('Erro ao buscar todos os produtos:', error.message); // Modificado o log para diferenciar
         res.status(500).json({ error: 'Erro ao buscar produtos do banco de dados.' });
     }
 });
@@ -319,7 +314,7 @@ app.get("/api/categorias/:slug/produtos", async (req, res) => {
     try {
         const { data: categoriaData, error: categoriaError } = await supabase
             .from('categorias').select('id').eq('slug', slug).single();
-        if (categoriaError && categoriaError.code !== 'PGRST116') throw categoriaError; // PGRST116 means no rows found
+        if (categoriaError && categoriaError.code !== 'PGRST116') throw categoriaError;
         if (!categoriaData) return res.status(404).json({ message: 'Categoria não encontrada.' });
         
         const { data: produtosData, error: produtosError } = await supabase
@@ -358,7 +353,7 @@ app.get('/busca.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'busca.html'));
 });
 
-// NOVA ROTA: Adicione esta rota para a nova página de detalhes do livro
+// Rota para a página de detalhes do livro
 app.get('/livro.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'livro.html'));
 });
