@@ -14,7 +14,6 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// --- Middleware de Autenticação ---
 const authenticateToken = (req, res, next) => {
     const token = req.cookies.token;
     if (token == null) return res.sendStatus(401);
@@ -35,7 +34,6 @@ const isAdmin = (req, res, next) => {
 };
 
 
-// --- Rotas de Autenticação ---
 app.post("/api/register", async (req, res) => {
     const { name, email, password, confirmPassword } = req.body;
 
@@ -53,7 +51,7 @@ app.post("/api/register", async (req, res) => {
             .eq('email', email)
             .single();
 
-        if (selectError && selectError.code !== 'PGRST116') throw selectError; // PGRST116 means no rows found
+        if (selectError && selectError.code !== 'PGRST116') throw selectError;
         if (existingUser) {
             return res.status(400).json({ message: 'Este e-mail já está cadastrado.' });
         }
@@ -123,7 +121,7 @@ app.post("/api/logout", (req, res) => {
     res.status(200).json({ message: 'Logout bem-sucedido.' });
 });
 
-// --- ROTA PARA O FORMULÁRIO DE CONTATO ---
+
 app.post("/api/contact", async (req, res) => {
     const { name, email, subject, message } = req.body;
 
@@ -133,16 +131,16 @@ app.post("/api/contact", async (req, res) => {
 
     try {
         const transporter = nodemailer.createTransport({
-            service: 'gmail', // Para Gmail
+            service: 'gmail', 
             auth: {
-                user: process.env.EMAIL_USER, // Seu e-mail (contosalmadepapel@gmail.com)
-                pass: process.env.EMAIL_PASS  // Sua "App Password" do Gmail
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS 
             }
         });
 
         const mailOptions = {
-            from: process.env.EMAIL_USER, // O remetente do e-mail
-            to: 'contosalmadepapel@gmail.com', // O destinatário do e-mail (para onde você quer receber)
+            from: process.env.EMAIL_USER, 
+            to: 'contosalmadepapel@gmail.com', 
             subject: `Contato Alma de Papel: ${subject}`,
             html: `
                 <p><strong>Nome:</strong> ${name}</p>
@@ -240,12 +238,8 @@ app.delete("/api/admin/products/:id", authenticateToken, isAdmin, async (req, re
     }
 });
 
-
-// --- Rotas Públicas (ORDEM ALTERADA AQUI) ---
-
-// Mova esta rota (mais específica) para antes das rotas mais gerais
 app.get("/api/products/search", async (req, res) => {
-    const { query } = req.query; // Pega o termo de busca da query string (ex: ?query=harry)
+    const { query } = req.query; 
     if (!query) {
         return res.status(400).json({ message: 'Parâmetro de busca "query" é obrigatório.' });
     }
@@ -254,13 +248,12 @@ app.get("/api/products/search", async (req, res) => {
         const { data, error } = await supabase
             .from('produto')
             .select('*')
-            // Usa 'ilike' para busca case-insensitive e '%' para correspondência parcial
             .or(`nome_produto.ilike.%${query}%,Autor_produto.ilike.%${query}%`);
 
         if (error) throw error;
         res.json(data);
     } catch (error) {
-        console.error('Erro ao buscar produtos (search):', error.message); // Modificado o log para diferenciar
+        console.error('Erro ao buscar produtos (search):', error.message); 
         res.status(500).json({ error: 'Erro ao buscar produtos do banco de dados.' });
     }
 });
@@ -292,7 +285,7 @@ app.get("/api/products", async (req, res) => {
         if (error) throw error;
         res.json(data);
     } catch (error) {
-        console.error('Erro ao buscar todos os produtos:', error.message); // Modificado o log para diferenciar
+        console.error('Erro ao buscar todos os produtos:', error.message); 
         res.status(500).json({ error: 'Erro ao buscar produtos do banco de dados.' });
     }
 });
@@ -348,12 +341,10 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Adicione esta rota para a nova página de busca
 app.get('/busca.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'busca.html'));
 });
 
-// Rota para a página de detalhes do livro
 app.get('/livro.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'livro.html'));
 });

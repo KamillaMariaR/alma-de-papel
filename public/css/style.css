@@ -2031,9 +2031,6 @@ footer {
         flex-basis: 100%;
     }
 }
-/* ============================================= */
-/*          ESTILOS DA PÁGINA DE ADMIN           */
-/* ============================================= */
 
 .admin-header {
     background-color: #cc4c7f;
@@ -2181,8 +2178,8 @@ footer {
 
 .product-detail-content {
     display: flex;
-    flex-wrap: wrap; /* Permite quebrar em linhas em telas menores */
-    gap: 40px; /* Espaço entre imagem e informações */
+    flex-wrap: wrap; 
+    gap: 40px; 
     background-color: #fff;
     padding: 30px;
     border-radius: 10px;
@@ -2190,9 +2187,9 @@ footer {
 }
 
 .product-image-area {
-    flex: 1; /* Ocupa o espaço disponível */
-    min-width: 300px; /* Largura mínima para a área da imagem */
-    max-width: 400px; /* Largura máxima para a imagem */
+    flex: 1; 
+    min-width: 300px;
+    max-width: 400px; 
     text-align: center;
 }
 
@@ -2204,11 +2201,11 @@ footer {
 }
 
 .product-info-area {
-    flex: 2; /* Ocupa mais espaço que a imagem */
-    min-width: 350px; /* Largura mínima para a área de informações */
+    flex: 2; 
+    min-width: 350px; 
     display: flex;
     flex-direction: column;
-    justify-content: flex-start; /* Alinha o conteúdo ao topo */
+    justify-content: flex-start; 
 }
 
 .product-detail-content h1 {
@@ -2240,7 +2237,7 @@ footer {
     display: flex;
     gap: 15px;
     margin-bottom: 30px;
-    flex-wrap: wrap; /* Permite quebrar em linhas */
+    flex-wrap: wrap; 
 }
 
 .product-detail-actions .btn {
@@ -2259,12 +2256,12 @@ footer {
 }
 
 .product-detail-actions .favorite-button.active i {
-    color: #fff; /* Garante que o ícone do coração seja branco quando ativo */
+    color: #fff; 
 }
 
 .product-detail-actions .favorite-button i {
     margin-right: 8px;
-    color: var(--color-text-dark); /* Cor padrão do coração */
+    color: var(--color-text-dark); 
 }
 
 .product-synopsis h3 {
@@ -2284,7 +2281,6 @@ footer {
     color: var(--color-text-dark);
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
     .product-detail-content {
         flex-direction: column;
@@ -2295,7 +2291,7 @@ footer {
 
     .product-image-area {
         min-width: unset;
-        max-width: 80%; /* Ajuste conforme necessário */
+        max-width: 80%; 
     }
 
     .product-info-area {

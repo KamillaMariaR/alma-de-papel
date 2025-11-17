@@ -1,8 +1,8 @@
 let currentUser = null;
-let allCategories = []; // Global variable to store all categories for easy lookup
+let allCategories = []; 
 
 document.addEventListener('DOMContentLoaded', () => {
-    let allProducts = []; // Pode conter todos os produtos ou resultados de busca, dependendo da página
+    let allProducts = []; 
     const productsContainer = document.getElementById('productsContainer');
     const cartItemCountElement = document.getElementById('cart-item-count');
     const mainNav = document.getElementById('mainNav');
@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const productsPerPage = 8;
     let currentlyLoadedCount = 0;
 
-    // Elementos da barra de pesquisa (adicionados aqui para serem globais no DOMContentLoaded)
+    
     const searchBarPage = document.getElementById('searchBarPage');
     const searchInputPage = document.getElementById('searchInputPage');
 
@@ -23,13 +23,12 @@ document.addEventListener('DOMContentLoaded', () => {
         currentYearElement.textContent = new Date().getFullYear();
     }
 
-    // Event listener para a barra de pesquisa
     if (searchBarPage) {
         searchBarPage.addEventListener('submit', (e) => {
-            e.preventDefault(); // Impede o envio padrão do formulário
+            e.preventDefault(); 
             const searchTerm = searchInputPage.value.trim();
             if (searchTerm) {
-                // Redireciona para a página de busca com o termo na URL
+                
                 window.location.href = `busca.html?query=${encodeURIComponent(searchTerm)}`;
             }
         });
@@ -54,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateUIForUser() {
         const userAccountLinks = document.querySelectorAll('#user-account-link');
         const logoutButton = document.getElementById('logoutButton');
-        const adminLinkContainer = document.getElementById('admin-link-container'); // Adicionado para admin.html
+        const adminLinkContainer = document.getElementById('admin-link-container');
 
         if (currentUser) {
             userAccountLinks.forEach(link => {
@@ -65,13 +64,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (window.location.pathname.endsWith('perfil.html')) {
-                // Redireciona admin para o painel de admin
+                
                 if (currentUser.role === 'admin') {
                     window.location.href = 'admin.html';
                     return;
                 }
 
-                // Atualiza os dados do perfil para usuários normais
+               
                 const welcomeMessageEl = document.getElementById('welcomeMessage');
                 const userNameEl = document.getElementById('userName');
                 const userEmailEl = document.getElementById('userEmail');
@@ -80,19 +79,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (userNameEl) userNameEl.textContent = currentUser.name;
                 if (userEmailEl) userEmailEl.textContent = currentUser.email;
 
-                // Esconde o link de admin se não for admin (já redirecionou acima, mas para garantir)
+                
                 if (adminLinkContainer) {
                     adminLinkContainer.classList.add('hidden');
                 }
 
             } else if (window.location.pathname.endsWith('admin.html')) {
-                // Se o usuário está na página admin.html e não é admin, redireciona
+               
                 if (currentUser.role !== 'admin') {
                     alert('Acesso negado. Esta área é apenas para administradores.');
                     window.location.href = 'index.html';
                     return;
                 }
-                // Se é admin, garante que o link de admin não aparece aqui, pois já está na página admin
+               
                 if (adminLinkContainer) {
                     adminLinkContainer.classList.add('hidden');
                 }
@@ -109,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     link.setAttribute('aria-label', 'Fazer Login');
                 }
             });
-            // Se o usuário não está logado e tenta acessar perfil ou admin, redireciona para login
+            
             if (window.location.pathname.endsWith('perfil.html') || window.location.pathname.endsWith('admin.html')) {
                 window.location.href = 'login.html';
             }
@@ -189,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- CÓDIGO PARA O FORMULÁRIO DE CONTATO ---
+   
     const contactForm = document.getElementById('contactForm');
     if (contactForm) {
         contactForm.addEventListener('submit', async (e) => {
@@ -210,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (response.ok) {
                     showFeedbackMessage(result.message, 'success', 'contactFormFeedback');
-                    contactForm.reset(); // Limpa o formulário após o envio
+                    contactForm.reset();
                 } else {
                     showFeedbackMessage(result.message, 'error', 'contactFormFeedback');
                 }
@@ -220,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-    // --- FIM DO CÓDIGO DO FORMULÁRIO DE CONTATO ---
+    
 
     function addToCart(productId) {
         if (!currentUser) {
@@ -228,12 +227,10 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = 'login.html';
             return;
         }
-        // allProducts pode não conter o produto se a página atual for "livro.html"
-        // e `allProducts` ainda não foi populado com todos os produtos.
-        // Precisamos garantir que o produto esteja disponível.
+       
         let product = allProducts.find(p => p.id === productId);
         if (!product && window.location.pathname.endsWith('livro.html')) {
-            // Se estiver na página de detalhes, o 'singleProduct' pode ser a fonte
+            
             const productDetailContent = document.getElementById('productDetailContent');
             if (productDetailContent && productDetailContent.dataset.product) {
                 product = JSON.parse(productDetailContent.dataset.product);
@@ -293,7 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (document.getElementById('favoritesContainer')) {
             renderFavoritesPage();
         }
-        // Para a página de detalhes do livro, atualiza o texto do botão
+      
         if (window.location.pathname.endsWith('livro.html')) {
             const favoriteButton = document.getElementById('favoriteDetailButton');
             if (favoriteButton) {
@@ -307,9 +304,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Função para buscar TODOS os produtos (usada em páginas como index, carrinho, favoritos)
+  
     async function fetchAllProducts() {
-        // Se já carregamos todos os produtos e não estamos na página de busca ou livro.html, retorna os existentes
+        
         if (allProducts.length > 0 && !window.location.pathname.endsWith('busca.html') && !window.location.pathname.endsWith('livro.html')) {
             return allProducts;
         }
@@ -327,9 +324,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // NOVA FUNÇÃO: Buscar todas as categorias de uma vez
+   
     async function fetchAllCategories() {
-        if (allCategories.length > 0) return allCategories; // Já buscado
+        if (allCategories.length > 0) return allCategories;
         try {
             const response = await fetch('/api/categorias');
             if (!response.ok) throw new Error('Falha ao carregar as categorias.');
@@ -343,12 +340,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderProducts(productsToRender, container) {
         if (!container) return;
-        // Se for a primeira renderização e não houver produtos, exibe mensagem
+       
         if (productsToRender.length === 0 && currentlyLoadedCount === 0) {
             container.innerHTML = '<p class="text-center" style="grid-column: 1 / -1;">Nenhum livro encontrado.</p>';
             return;
         } else if (productsToRender.length === 0) {
-            // Se não há mais produtos para carregar, mas já carregou alguns
+            
             return;
         }
 
@@ -396,14 +393,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const loadMoreBtn = document.getElementById('loadMoreBtn');
         if (!loadMoreBtn) return;
 
-        // Verifica se ainda há produtos para carregar
         if (allProducts.length > currentlyLoadedCount) {
             loadMoreBtn.classList.remove('hidden');
         } else {
             loadMoreBtn.classList.add('hidden');
         }
 
-        // Remove listener anterior para evitar duplicações
         loadMoreBtn.removeEventListener('click', loadMoreHandler);
         loadMoreBtn.addEventListener('click', loadMoreHandler);
 
@@ -521,14 +516,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!prodResponse.ok) throw new Error('Não foi possível buscar os livros desta categoria.');
             let products = await prodResponse.json();
 
-            allProducts = products; // Atualiza allProducts com os resultados da categoria para paginação
-            currentlyLoadedCount = 0; // Reseta para a lógica de paginação
+            allProducts = products; 
+            currentlyLoadedCount = 0;
 
-            if (productsContainerEl) productsContainerEl.innerHTML = ''; // Limpa a mensagem "Buscando..."
+            if (productsContainerEl) productsContainerEl.innerHTML = ''; 
             const initialProducts = allProducts.slice(0, productsPerPage);
             renderProducts(initialProducts, productsContainerEl);
             currentlyLoadedCount = initialProducts.length;
-            setupLoadMoreButton(); // Reconfigura o botão de "Ver Mais" para a categoria
+            setupLoadMoreButton(); 
         } catch (error) {
             if (titleEl) titleEl.textContent = 'Erro';
             if (descriptionEl) descriptionEl.textContent = error.message;
@@ -536,7 +531,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // FUNÇÃO PARA RENDERIZAR A PÁGINA DE BUSCA
+ 
     async function renderSearchPage() {
         const params = new URLSearchParams(window.location.search);
         const query = params.get('query');
@@ -546,7 +541,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const loadMoreBtn = document.getElementById('loadMoreBtn');
 
         if (searchInputPage && query) {
-            searchInputPage.value = decodeURIComponent(query); // Preenche o campo de busca
+            searchInputPage.value = decodeURIComponent(query); 
         }
 
         if (!query) {
@@ -560,17 +555,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if (searchQueryDisplay) searchQueryDisplay.textContent = decodeURIComponent(query);
         if (document.title) document.title = `Busca por "${decodeURIComponent(query)}" - Alma de Papel`;
         if (productsContainerEl) productsContainerEl.innerHTML = '<p class="text-center" style="grid-column: 1 / -1;">Buscando livros...</p>';
-        if (loadMoreBtn) loadMoreBtn.classList.add('hidden'); // Esconde até que os resultados sejam carregados
+        if (loadMoreBtn) loadMoreBtn.classList.add('hidden'); 
 
         try {
             const response = await fetch(`/api/products/search?query=${encodeURIComponent(query)}`);
             if (!response.ok) throw new Error('Falha ao buscar produtos.');
             const searchResults = await response.json();
 
-            allProducts = searchResults; // 'allProducts' agora contém os resultados da busca para paginação
-            currentlyLoadedCount = 0; // Reseta o contador para a paginação dos resultados da busca
+            allProducts = searchResults;
+            currentlyLoadedCount = 0; 
 
-            if (productsContainerEl) productsContainerEl.innerHTML = ''; // Limpa a mensagem "Buscando livros..."
+            
+        if (productsContainerEl) productsContainerEl.innerHTML = ''; 
 
             if (allProducts.length === 0) {
                 if (searchResultDescription) searchResultDescription.textContent = `Não encontramos nenhum livro para "${decodeURIComponent(query)}". Tente outro termo!`;
@@ -580,7 +576,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const initialProducts = allProducts.slice(0, productsPerPage);
                 renderProducts(initialProducts, productsContainerEl);
                 currentlyLoadedCount = initialProducts.length;
-                setupLoadMoreButton(); // Reconfigura o botão de "Ver Mais" para os resultados da busca
+                setupLoadMoreButton();
             }
         } catch (error) {
             console.error('Erro na busca:', error.message);
@@ -590,7 +586,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // NOVA FUNÇÃO: Renderizar página de detalhes de um único produto
+   
     async function renderSingleProductPage() {
         const params = new URLSearchParams(window.location.search);
         const productId = params.get('id');
@@ -619,7 +615,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const [productResponse, categoriesResponse] = await Promise.all([
                 fetch(`/api/products/${productId}`),
-                fetchAllCategories() // Garante que as categorias estejam carregadas
+                fetchAllCategories() 
             ]);
 
             if (!productResponse.ok) {
@@ -628,9 +624,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const product = await productResponse.json();
 
-            // Store the single product in allProducts for addToCart/toggleFavorite to find it
-            // Or explicitly pass the product object to them. For simplicity, we'll ensure it's in allProducts.
-            // Resetting allProducts to just this one ensures handlers find the correct product
+          
             allProducts = [product]; 
 
             if (pageTitle) pageTitle.textContent = `${product.nome_produto} - Alma de Papel`;
@@ -639,7 +633,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (productDetailName) productDetailName.textContent = product.nome_produto;
             if (productDetailAuthor) productDetailAuthor.textContent = product.Autor_produto || 'Autor desconhecido';
             
-            // Encontra o nome da categoria usando a lista global allCategories
+           
             const category = allCategories.find(cat => cat.id === product.categoria_id);
             if (productDetailCategory) productDetailCategory.textContent = `Categoria: ${category ? category.nome : 'Desconhecida'}`;
 
@@ -647,13 +641,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 ? `R$ ${product.preco_produto.toFixed(2).replace('.', ',')}`
                 : 'Preço a consultar';
             if (productDetailPrice) productDetailPrice.textContent = priceText;
-            // Assumindo que a tabela 'produto' tem uma coluna 'sinopse'
+            
             if (productDetailSynopsis) productDetailSynopsis.textContent = product.sinopse || 'Sinopse não disponível.';
 
-            // Define um atributo de dados no conteúdo para facilitar o acesso aos handlers dos botões
+            
             if (content) content.dataset.product = JSON.stringify(product);
 
-            // Adiciona event listeners para os botões na página de detalhes
+            
             if (addToCartDetailButton) {
                 addToCartDetailButton.onclick = () => addToCart(product.id);
             }
@@ -679,14 +673,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function initializePage() {
         await checkUserSession();
-        await fetchAllCategories(); // Carrega todas as categorias no início de todas as páginas
+        await fetchAllCategories(); 
 
         const currentPage = window.location.pathname.split("/").pop() || "index.html";
 
         if (currentPage === 'index.html' || currentPage === '') {
             if (productsContainer) {
                 productsContainer.innerHTML = '';
-                await fetchAllProducts(); // Garante que allProducts seja populado para a página inicial
+                await fetchAllProducts(); 
                 const initialProducts = allProducts.slice(0, productsPerPage);
                 renderProducts(initialProducts, productsContainer);
                 currentlyLoadedCount = initialProducts.length;
@@ -695,28 +689,24 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (currentPage === 'categorias.html') {
             renderCategoryListPage();
         } else if (currentPage === 'categoria.html') {
-            // fetchAllProducts é chamado indiretamente em renderSingleCategoryPage se necessário.
+           
             renderSingleCategoryPage();
         } else if (currentPage === 'favoritos.html') {
-            await fetchAllProducts(); // Necessário para renderizar produtos favoritos
+            await fetchAllProducts(); 
             renderFavoritesPage();
         } else if (currentPage === 'carrinho.html') {
-            await fetchAllProducts(); // Necessário para renderizar itens do carrinho
+            await fetchAllProducts(); 
             renderCartPage();
-        } else if (currentPage === 'busca.html') { // Nova condição para a página de busca
+        } else if (currentPage === 'busca.html') { 
             renderSearchPage();
-        } else if (currentPage === 'livro.html') { // NOVA CONDIÇÃO para a página de detalhes do livro
+        } else if (currentPage === 'livro.html') { 
             renderSingleProductPage();
         }
         else if (currentPage === 'perfil.html') {
-            // O updateUIForUser já cuida do redirecionamento ou preenchimento
-            // mas podemos garantir que allProducts esteja disponível se necessário para outras features futuras
+           
             await fetchAllProducts();
         }
-        // Para outras páginas como 'sobre.html', 'contato.html', 'cadastro.html', 'login.html'
-        // fetchAllProducts pode não ser estritamente necessário no carregamento inicial,
-        // mas é bom ter o array populado caso o usuário interaja com o carrinho/favoritos.
-        // Já está sendo chamado em checkUserSession indiretamente se updateUIForUser não redirecionar.
+        
     }
 
     initializePage();

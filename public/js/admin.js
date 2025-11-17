@@ -6,12 +6,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const cancelEditBtn = document.getElementById('cancelEditBtn');
     const productIdField = document.getElementById('productId');
     
-    // Referências aos campos do formulário
     const productNameInput = document.getElementById('productName');
     const productAuthorInput = document.getElementById('productAuthor');
     const productImageInput = document.getElementById('productImage');
     const productPriceInput = document.getElementById('productPrice');
-    const productSynopsisInput = document.getElementById('productSynopsis'); // NOVO: Referência ao campo de sinopse
+    const productSynopsisInput = document.getElementById('productSynopsis'); 
 
     let allCategories = [];
 
@@ -104,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
             imagem_url: productImageInput.value,
             categoria_id: parseInt(categorySelect.value, 10),
             preco_produto: parseFloat(priceString),
-            sinopse: productSynopsisInput.value // NOVO: Inclui a sinopse no objeto de dados
+            sinopse: productSynopsisInput.value 
         };
         
         const id = productIdField.value;
@@ -150,7 +149,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (target.classList.contains('edit-btn')) {
-            // Busca o produto específico para garantir que temos todos os dados, incluindo a sinopse
             const response = await fetch(`/api/products/${id}`); 
             if (!response.ok) {
                 showAdminFeedback('Não foi possível carregar os dados do produto para edição.', 'error');
@@ -166,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 productImageInput.value = product.imagem_url;
                 categorySelect.value = product.categoria_id;
                 productPriceInput.value = product.preco_produto;
-                productSynopsisInput.value = product.sinopse || ''; // NOVO: Preenche o campo de sinopse ao editar
+                productSynopsisInput.value = product.sinopse || ''; 
                 cancelEditBtn.classList.remove('hidden');
                 window.scrollTo(0, 0);
             }
